@@ -112,7 +112,7 @@ function NavLinkItem({
       }
     >
       <item.icon className={cn('shrink-0', large ? 'h-5 w-5' : 'h-4 w-4')} />
-      {t(item.labelKey)}
+      <span className="min-w-0 leading-snug">{t(item.labelKey)}</span>
     </NavLink>
   )
 }
@@ -175,7 +175,7 @@ export function AppLayout() {
   )
 
   return (
-    <div className="min-h-screen bg-paper text-ink lg:grid lg:grid-cols-[240px_1fr]">
+    <div className="min-h-screen bg-paper text-ink lg:grid lg:grid-cols-[minmax(240px,280px)_1fr]">
       <aside className="hidden ink-wash lg:flex lg:flex-col lg:border-r lg:border-white/10">
         <div className="flex items-center gap-2.5 px-5 py-5">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 font-display text-sm font-bold text-on-ink">
@@ -198,20 +198,20 @@ export function AppLayout() {
       </aside>
 
       <div className="flex min-h-screen flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-line bg-paper/90 px-4 backdrop-blur md:px-6">
-          <div className="flex items-center gap-2">
+        <header className="sticky top-0 z-30 flex min-h-14 items-center justify-between gap-2 border-b border-line bg-paper/90 px-3 backdrop-blur sm:gap-3 sm:px-4 md:px-6">
+          <div className="flex min-w-0 items-center gap-2">
             <button
-              className="min-h-11 min-w-11 rounded-md p-2 hover:bg-paper-2 lg:hidden"
+              className="min-h-11 min-w-11 shrink-0 rounded-md p-2 hover:bg-paper-2 lg:hidden"
               onClick={() => setMobileOpen(true)}
               aria-label="Open navigation"
             >
               <Menu className="h-5 w-5" />
             </button>
-            <div className="hidden sm:block">
-              <p className="text-xs text-muted">
+            <div className="hidden min-w-0 sm:block">
+              <p className="truncate text-xs text-muted">
                 {t('today.hi', { name: tenant.ownerName.split(' ')[0] })}
               </p>
-              <p className="text-sm font-semibold">
+              <p className="truncate text-sm font-semibold">
                 {t('today.desk')} ·{' '}
                 {new Date().toLocaleDateString('en-LK', {
                   weekday: 'long',
@@ -221,12 +221,28 @@ export function AppLayout() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <LanguageSwitcher compact className="hidden sm:inline-flex" />
             <div className="hidden md:block">
               <ThemeSwitcher compact />
             </div>
-            <Button asChild size={simpleMode ? 'default' : 'sm'} variant="cash" className="min-h-11">
+            <Button
+              asChild
+              size="icon"
+              variant="cash"
+              className="min-h-11 min-w-11 sm:hidden"
+              aria-label={t('nav.quickOrder')}
+            >
+              <Link to="/app/orders/new">
+                <ShoppingBag className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size={simpleMode ? 'default' : 'sm'}
+              variant="cash"
+              className="hidden min-h-11 whitespace-nowrap sm:inline-flex"
+            >
               <Link to="/app/orders/new">{t('nav.quickOrder')}</Link>
             </Button>
             <div className="relative">
@@ -301,7 +317,7 @@ export function AppLayout() {
 
         <main
           className={cn(
-            'flex-1 px-4 py-5 md:px-6 md:py-6',
+            'min-w-0 flex-1 px-4 py-5 md:px-6 md:py-6',
             simpleMode && 'pb-28 lg:pb-6',
           )}
         >
@@ -408,19 +424,26 @@ export function AppLayout() {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-              className="fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col ink-wash lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 flex w-[min(100vw-3rem,280px)] flex-col ink-wash lg:hidden"
             >
-              <div className="flex items-center justify-between px-4 py-4">
-                <p className="font-display font-bold text-white">{tenant.businessName}</p>
-                <button className="rounded-md p-2 text-white" onClick={() => setMobileOpen(false)}>
+              <div className="flex shrink-0 items-center justify-between gap-2 px-4 py-4">
+                <p className="min-w-0 truncate font-display font-bold text-white">
+                  {tenant.businessName}
+                </p>
+                <button
+                  className="min-h-11 min-w-11 shrink-0 rounded-md p-2 text-white"
+                  onClick={() => setMobileOpen(false)}
+                >
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <div className="flex flex-col gap-2 px-3 pb-3">
+              <div className="flex shrink-0 flex-col gap-2 px-3 pb-3">
                 <LanguageSwitcher className="w-full justify-center border-white/15 bg-white/5" />
                 <ThemeSwitcher compact className="w-full justify-center border-white/15 bg-white/5" />
               </div>
-              <NavItems onNavigate={() => setMobileOpen(false)} />
+              <div className="min-h-0 flex-1 overflow-y-auto pb-6">
+                <NavItems onNavigate={() => setMobileOpen(false)} />
+              </div>
             </motion.aside>
           </>
         ) : null}

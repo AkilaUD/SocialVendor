@@ -52,14 +52,14 @@ export function SettingsPage() {
         tip={t('settings.tip')}
       />
 
-      <div className="mb-5 flex gap-1 overflow-x-auto">
+      <div className="mb-5 flex max-w-full gap-1 overflow-x-auto pb-1">
         {tabs.map((item) => (
           <button
             key={item.id}
             type="button"
             onClick={() => setTab(item.id)}
             className={cn(
-              'min-h-10 rounded-full px-3 py-1.5 text-xs font-semibold',
+              'min-h-11 shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold',
               tab === item.id ? 'bg-ink text-on-ink' : 'border border-line bg-surface text-muted',
             )}
           >

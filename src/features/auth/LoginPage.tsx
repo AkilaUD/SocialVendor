@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { useAppStore } from '@/stores/useAppStore'
 import { useT } from '@/i18n'
 
@@ -54,9 +53,6 @@ export function LoginPage() {
 
   return (
     <div>
-      <div className="mb-4 flex justify-end">
-        <LanguageSwitcher compact />
-      </div>
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-lagoon">{t('auth.signIn')}</p>
       <h1 className="mt-2 font-display text-3xl font-bold text-ink">{t('auth.openDesk')}</h1>
       <p className="mt-2 text-sm text-muted">{t('auth.otpHint')}</p>

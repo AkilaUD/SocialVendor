@@ -85,14 +85,16 @@ export function TrackingPage() {
     <div className="min-h-screen paper-noise">
       <div className="ink-wash px-4 py-10 text-on-ink">
         <div className="mx-auto max-w-lg">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cash">
-            {liveTenant.businessName || tenant.businessName}
-          </p>
-          <div className="mb-3 flex justify-end">
-            <LanguageSwitcher compact className="border-white/20 bg-white/10" />
+          <div className="mb-3 flex items-start justify-between gap-3">
+            <p className="min-w-0 truncate text-xs font-semibold uppercase tracking-[0.16em] text-cash">
+              {liveTenant.businessName || tenant.businessName}
+            </p>
+            <LanguageSwitcher compact className="shrink-0 border-white/20 bg-white/10" />
           </div>
-          <h1 className="mt-2 font-display text-3xl font-bold text-white">{t('tracking.title')}</h1>
-          <p className="mt-1 text-on-ink/70">{shipment.waybill}</p>
+          <h1 className="mt-2 font-display text-2xl font-bold text-white sm:text-3xl">
+            {t('tracking.title')}
+          </h1>
+          <p className="mt-1 break-all text-on-ink/70">{shipment.waybill}</p>
         </div>
       </div>
       <div className="mx-auto max-w-lg space-y-4 px-4 py-8">

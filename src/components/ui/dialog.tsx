@@ -17,13 +17,13 @@ export function DialogContent({
       <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-ink/50 backdrop-blur-[2px] data-[state=open]:animate-in data-[state=closed]:animate-out" />
       <DialogPrimitive.Content
         className={cn(
-          'fixed left-1/2 top-1/2 z-50 w-[min(100%-1.5rem,34rem)] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-line bg-surface p-6 shadow-[var(--shadow-float)] focus:outline-none',
+          'fixed left-1/2 top-1/2 z-50 max-h-[min(90vh,40rem)] w-[min(100%-1.5rem,34rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow-float)] focus:outline-none sm:p-6',
           className,
         )}
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1 text-muted hover:bg-paper-2 hover:text-ink">
+        <DialogPrimitive.Close className="absolute right-3 top-3 flex min-h-11 min-w-11 items-center justify-center rounded-md text-muted hover:bg-paper-2 hover:text-ink">
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>

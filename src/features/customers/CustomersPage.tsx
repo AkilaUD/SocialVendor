@@ -37,14 +37,14 @@ export function CustomersPage() {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
           <Input className="min-h-11 pl-9" placeholder={t('customers.search')} value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
-        <div className="flex gap-1">
+        <div className="flex max-w-full gap-1 overflow-x-auto pb-1">
           {(['all', 'low', 'medium', 'high'] as const).map((r) => (
             <button
               key={r}
               type="button"
               onClick={() => setRisk(r)}
               className={cn(
-                'min-h-10 rounded-full px-3 py-1.5 text-xs font-semibold capitalize',
+                'min-h-11 shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold capitalize',
                 risk === r ? 'bg-ink text-on-ink' : 'border border-line bg-surface text-muted',
               )}
             >

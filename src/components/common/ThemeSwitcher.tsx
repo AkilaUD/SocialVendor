@@ -15,7 +15,7 @@ export function ThemeSwitcher({
   return (
     <div
       className={cn(
-        'inline-flex items-center gap-1 rounded-full border border-line bg-surface p-1',
+        'inline-flex items-center gap-0.5 rounded-full border border-line bg-surface p-1 sm:gap-1',
         className,
       )}
       role="group"
@@ -31,16 +31,18 @@ export function ThemeSwitcher({
           key={t.id}
           type="button"
           title={t.hint}
+          aria-label={t.label}
           aria-pressed={theme === t.id}
           onClick={() => setTheme(t.id as ThemeId)}
           className={cn(
-            'rounded-full px-2.5 py-1 text-xs font-semibold transition',
+            'min-h-11 min-w-9 rounded-full px-2 text-xs font-semibold transition sm:min-w-0 sm:px-2.5',
             theme === t.id
               ? 'bg-ink text-on-ink'
               : 'text-muted hover:bg-paper-2 hover:text-ink',
           )}
         >
-          {t.label}
+          <span className="sm:hidden">{t.label.slice(0, 1)}</span>
+          <span className="hidden sm:inline">{t.label}</span>
         </button>
       ))}
     </div>

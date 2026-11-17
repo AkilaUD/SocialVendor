@@ -389,6 +389,13 @@ export const en = {
     finalTitle: 'Ready to stop running your shop in chats alone?',
     finalBody: 'Open the sample shop in one tap — or start free today.',
     createFree: 'Create free account',
+    previewTitle: 'What sellers see today',
+    previewNew: 'New chat order',
+    previewNewValue: 'Dilani · Batik dress · Nugegoda',
+    previewRisk: 'Needs attention',
+    previewRiskValue: 'Ask advance — careful buyer',
+    previewCash: 'Cash waiting',
+    previewCashValue: '2 courier lines not ticked yet',
   },
   tracking: {
     title: 'Find your parcel',

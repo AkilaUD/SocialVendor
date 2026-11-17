@@ -24,12 +24,14 @@ export function MarketingLayout() {
   return (
     <div className="min-h-screen paper-noise text-ink">
       <header className="sticky top-0 z-40 border-b border-line/60 bg-paper/90 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:px-6">
-          <Link to="/" className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-ink font-display text-sm font-bold text-on-ink">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:h-16 sm:gap-3 sm:px-4 md:px-6">
+          <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-2.5">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ink font-display text-sm font-bold text-on-ink">
               SO
             </span>
-            <span className="font-display text-lg font-bold tracking-tight">{t('brand.name')}</span>
+            <span className="hidden truncate font-display text-lg font-bold tracking-tight min-[380px]:inline">
+              {t('brand.name')}
+            </span>
           </Link>
           <nav className="hidden items-center gap-5 lg:flex">
             {links.map((l) => (
@@ -46,13 +48,13 @@ export function MarketingLayout() {
             ))}
             <LanguageSwitcher compact />
             <ThemeSwitcher compact />
-            <Button asChild variant="lagoon">
+            <Button asChild variant="lagoon" className="min-h-11">
               <Link to="/register">{t('common.startFree')}</Link>
             </Button>
           </nav>
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2 lg:hidden">
             <LanguageSwitcher compact />
-            <ThemeSwitcher compact />
+            <ThemeSwitcher compact className="hidden min-[420px]:inline-flex" />
             <button
               className="min-h-11 min-w-11 rounded-md p-2 text-ink"
               onClick={() => setOpen((v) => !v)}
@@ -71,6 +73,9 @@ export function MarketingLayout() {
               className="overflow-hidden border-t border-line lg:hidden"
             >
               <div className="flex flex-col gap-2 px-4 py-4">
+                <div className="mb-1 min-[420px]:hidden">
+                  <ThemeSwitcher compact className="w-full justify-center" />
+                </div>
                 {links.map((l) => (
                   <Link
                     key={l.to}
@@ -94,7 +99,7 @@ export function MarketingLayout() {
       <Outlet />
       <footer className="border-t border-line bg-ink text-on-ink/80">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 md:flex-row md:items-center md:justify-between md:px-6">
-          <div>
+          <div className="min-w-0">
             <p className="font-display text-lg font-bold text-on-ink">{t('brand.name')}</p>
             <p className="mt-1 text-sm text-on-ink/60">{t('marketing.heroBody')}</p>
           </div>

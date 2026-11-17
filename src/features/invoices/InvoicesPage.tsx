@@ -26,46 +26,47 @@ export function InvoicesPage() {
         description={t('invoices.description')}
       />
 
-      <div className="mb-4 flex gap-1">
+      <div className="mb-4 flex max-w-full gap-1 overflow-x-auto pb-1">
         {(['all', 'sent', 'paid', 'draft', 'void'] as const).map((f) => (
           <button
             key={f}
             type="button"
             onClick={() => setFilter(f)}
             className={cn(
-              'rounded-full px-3 py-1.5 text-xs font-semibold capitalize',
+              'min-h-11 shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold capitalize',
               filter === f ? 'bg-ink text-on-ink' : 'border border-line bg-surface text-muted',
             )}
           >
-            {f}
+            {f === 'all' ? t('common.all') : f}
           </button>
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-[var(--shadow-desk)]">
+      <div className="rounded-xl border border-line bg-surface shadow-[var(--shadow-desk)]">
         {rows.map((inv) => (
           <div
             key={inv.id}
             className="flex flex-wrap items-center justify-between gap-3 border-b border-line/70 px-4 py-3 last:border-0"
           >
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-semibold">{inv.number}</p>
               <p className="text-xs text-muted">
                 {inv.customerName} · {inv.orderNumber} · {inv.issuedAt}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <p className="text-sm font-semibold">{formatLkr(inv.total)}</p>
               <Badge variant={inv.status === 'paid' ? 'ok' : 'lagoon'}>{inv.status}</Badge>
-              <Button size="sm" variant="outline" onClick={() => setActive(inv)}>
-                View
+              <Button size="sm" variant="outline" className="min-h-11" onClick={() => setActive(inv)}>
+                {t('common.view')}
               </Button>
               <Button
                 size="sm"
                 variant="soft"
+                className="min-h-11"
                 onClick={() => toast.success(`WhatsApp invoice link queued for ${inv.customerName}`)}
               >
-                Send
+                {t('common.send')}
               </Button>
             </div>
           </div>

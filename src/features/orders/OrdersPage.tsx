@@ -74,14 +74,14 @@ export function OrdersPage() {
         </div>
       </div>
 
-      <div className="mb-4 flex gap-1 overflow-x-auto pb-1">
+      <div className="mb-4 flex max-w-full gap-1 overflow-x-auto pb-1">
         {filterIds.map((id) => (
           <button
             key={id}
             type="button"
             onClick={() => setStatus(id)}
             className={cn(
-              'min-h-10 shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold',
+              'min-h-11 shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold',
               status === id ? 'bg-ink text-on-ink' : 'border border-line bg-surface text-muted',
             )}
           >
@@ -101,8 +101,8 @@ export function OrdersPage() {
           }}
         />
       ) : (
-        <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-[var(--shadow-desk)]">
-          <div className="hidden grid-cols-[1fr_1fr_auto_auto_auto] gap-3 border-b border-line bg-paper px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-muted md:grid">
+        <div className="rounded-xl border border-line bg-surface shadow-[var(--shadow-desk)]">
+          <div className="hidden grid-cols-[1fr_1fr_auto_auto_auto] gap-3 border-b border-line bg-paper px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-muted lg:grid">
             <span>{t('orders.title')}</span>
             <span>{t('nav.customers')}</span>
             <span>{t('nav.cod')}</span>
@@ -113,23 +113,25 @@ export function OrdersPage() {
             <Link
               key={o.id}
               to={`/app/orders/${o.id}`}
-              className="grid gap-2 border-b border-line/70 px-4 py-3 last:border-0 hover:bg-paper md:grid-cols-[1fr_1fr_auto_auto_auto] md:items-center md:gap-3"
+              className="grid gap-2 border-b border-line/70 px-4 py-3 last:border-0 hover:bg-paper lg:grid-cols-[1fr_1fr_auto_auto_auto] lg:items-center lg:gap-3"
             >
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm font-semibold">{o.number}</p>
                 <p className="text-xs text-muted capitalize">
                   {o.channel} · {new Date(o.createdAt).toLocaleString('en-LK')}
                 </p>
               </div>
-              <div>
-                <p className="text-sm font-medium">{o.customerName}</p>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium">{o.customerName}</p>
                 <p className="text-xs text-muted">{formatPhone(o.customerPhone)}</p>
               </div>
-              <p className="text-sm font-semibold md:text-right">
+              <p className="text-sm font-semibold lg:text-right">
                 {formatLkr(o.codAmount || o.subtotal + o.deliveryFee - o.discount)}
               </p>
-              <RiskBadge level={o.riskLevel} />
-              <OrderStatusBadge status={o.status} />
+              <div className="flex flex-wrap items-center gap-2 lg:contents">
+                <RiskBadge level={o.riskLevel} />
+                <OrderStatusBadge status={o.status} />
+              </div>
             </Link>
           ))}
         </div>

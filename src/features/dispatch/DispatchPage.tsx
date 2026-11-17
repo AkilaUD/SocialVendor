@@ -44,8 +44,8 @@ export function DispatchPage() {
           <div className="mt-3 space-y-2">
             {packQueue.map((o) => (
               <div key={o.id} className="rounded-lg border border-line px-3 py-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold">
                       {o.number} · {o.customerName}
                     </p>
@@ -95,15 +95,15 @@ export function DispatchPage() {
             {shipments.map((s) => (
               <div
                 key={s.id}
-                className="flex items-center justify-between rounded-lg border border-line px-3 py-3"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line px-3 py-3"
               >
-                <div>
-                  <p className="text-sm font-semibold">{s.waybill}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold">{s.waybill}</p>
                   <p className="text-xs text-muted">
                     {s.orderNumber} · {s.courier} · {s.district}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="shrink-0 text-right">
                   <p className="text-xs font-semibold capitalize text-muted">
                     {s.status.replaceAll('_', ' ')}
                   </p>

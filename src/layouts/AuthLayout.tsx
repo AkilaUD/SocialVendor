@@ -26,9 +26,9 @@ export function AuthLayout() {
         </div>
         <p className="relative z-10 text-sm text-mint/50">Demo tenant: Lanka Loom Atelier · Growth plan</p>
       </aside>
-      <main className="flex items-center justify-center bg-paper px-4 py-10">
+      <main className="flex items-center justify-center bg-paper px-4 py-8 sm:py-10">
         <div className="w-full max-w-md">
-          <div className="mb-4 flex justify-end lg:hidden">
+          <div className="mb-4 flex justify-end">
             <LanguageSwitcher compact />
           </div>
           <Outlet />

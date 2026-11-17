@@ -391,6 +391,13 @@ export const ta: EnMessages = {
     finalTitle: 'சாட்டில் மட்டும் கடையை ஓட்டுவதை நிறுத்தவா?',
     finalBody: 'ஒரு தட்டில் மாதிரி கடை — அல்லது இலவசமாக தொடங்குங்கள்.',
     createFree: 'இலவச கணக்கு',
+    previewTitle: 'இன்று விற்பனையாளர் பார்ப்பது',
+    previewNew: 'புதிய சாட் ஆர்டர்',
+    previewNewValue: 'Dilani · Batik dress · Nugegoda',
+    previewRisk: 'கவனம் தேவை',
+    previewRiskValue: 'முன்பணம் கேளுங்கள் — கவனம் வாடிக்கையாளர்',
+    previewCash: 'பணம் காத்திருக்கிறது',
+    previewCashValue: '2 கூரியர் வரிகள் இன்னும் டிக் ஆகவில்லை',
   },
   tracking: {
     title: 'உங்கள் பார்சலைத் தேடுங்கள்',

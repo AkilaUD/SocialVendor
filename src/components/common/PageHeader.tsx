@@ -18,8 +18,13 @@ export function PageHeader({
   className?: string
 }) {
   return (
-    <div className={cn('mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between', className)}>
-      <div>
+    <div
+      className={cn(
+        'mb-6 flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:justify-between',
+        className,
+      )}
+    >
+      <div className="min-w-0 flex-1">
         {eyebrow ? (
           <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-lagoon">{eyebrow}</p>
         ) : null}
@@ -32,7 +37,11 @@ export function PageHeader({
           </p>
         ) : null}
       </div>
-      {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
+      {actions ? (
+        <div className="flex w-full min-w-0 flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+          {actions}
+        </div>
+      ) : null}
     </div>
   )
 }

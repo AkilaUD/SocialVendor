@@ -36,15 +36,15 @@ export function PaymentsPage() {
       />
 
       <div className="mb-4 rounded-xl border border-line bg-surface p-4 shadow-[var(--shadow-desk)]">
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-ink text-on-ink">
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink text-on-ink">
             <Building2 className="h-5 w-5" />
           </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold tracking-wide text-muted">
               {t('payments.yourAccount')}
             </p>
-            <p className="font-semibold">
+            <p className="break-words font-semibold">
               {tenant.bankAccount.bankName} · {tenant.bankAccount.accountName}
             </p>
             <p className="text-sm text-muted">
@@ -57,14 +57,14 @@ export function PaymentsPage() {
         </div>
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-1">
+      <div className="mb-4 flex max-w-full gap-1 overflow-x-auto pb-1">
         {(['all', 'pending', 'verified', 'rejected'] as const).map((f) => (
           <button
             key={f}
             type="button"
             onClick={() => setFilter(f)}
             className={cn(
-              'min-h-10 rounded-full px-3 py-1.5 text-xs font-semibold capitalize',
+              'min-h-11 shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold capitalize',
               filter === f ? 'bg-ink text-on-ink' : 'border border-line bg-surface text-muted',
             )}
           >

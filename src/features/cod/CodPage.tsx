@@ -37,7 +37,7 @@ export function CodPage() {
         actions={
           <Button
             variant="cash"
-            className="min-h-11"
+            className="h-auto min-h-11 max-w-full whitespace-normal px-4 py-2 text-left leading-snug"
             onClick={() =>
               toast.success(t('cod.importCsv'), {
                 description: t('cod.tip'),
@@ -70,19 +70,19 @@ export function CodPage() {
         />
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-[var(--shadow-desk)]">
+      <div className="rounded-xl border border-line bg-surface shadow-[var(--shadow-desk)]">
         {remittances.map((r) => (
           <div
             key={r.id}
             className="flex flex-wrap items-center justify-between gap-3 border-b border-line/70 px-4 py-3 last:border-0"
           >
-            <div>
-              <p className="text-sm font-semibold">{r.waybill}</p>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold">{r.waybill}</p>
               <p className="text-xs text-muted">
                 {r.courier} · {r.statementRef} · {r.remittedAt}
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex shrink-0 flex-wrap items-center gap-3">
               <div className="text-right">
                 <p className="text-sm font-semibold">{formatLkr(r.amount)}</p>
                 <p className="text-xs text-muted">Fee {formatLkr(r.fee)}</p>

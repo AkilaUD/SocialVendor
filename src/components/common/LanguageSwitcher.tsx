@@ -2,10 +2,10 @@ import { useLocaleStore } from '@/stores/useLocaleStore'
 import type { Locale } from '@/i18n/types'
 import { cn } from '@/lib/utils'
 
-const options: Array<{ id: Locale; label: string }> = [
-  { id: 'en', label: 'EN' },
-  { id: 'si', label: 'සිං' },
-  { id: 'ta', label: 'தமிழ்' },
+const options: Array<{ id: Locale; label: string; short: string }> = [
+  { id: 'en', label: 'EN', short: 'EN' },
+  { id: 'si', label: 'සිං', short: 'සිං' },
+  { id: 'ta', label: 'தமிழ்', short: 'த' },
 ]
 
 export function LanguageSwitcher({
@@ -37,15 +37,17 @@ export function LanguageSwitcher({
           key={o.id}
           type="button"
           aria-pressed={locale === o.id}
+          aria-label={o.label}
           onClick={() => setLocale(o.id)}
           className={cn(
-            'min-h-9 rounded-full px-2.5 py-1 text-xs font-semibold transition',
+            'min-h-11 min-w-9 rounded-full px-2 text-xs font-semibold transition sm:px-2.5',
             locale === o.id
               ? 'bg-ink text-on-ink'
               : 'text-muted hover:bg-paper-2 hover:text-ink',
           )}
         >
-          {o.label}
+          <span className="min-[380px]:hidden">{o.short}</span>
+          <span className="hidden min-[380px]:inline">{o.label}</span>
         </button>
       ))}
     </div>

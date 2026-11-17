@@ -49,9 +49,9 @@ export function OrderStatusBadge({ status }: { status: OrderStatus }) {
   const t = useT()
   const Icon = orderIcon[status]
   return (
-    <Badge variant={orderVariant[status]} className="gap-1">
-      <Icon className="h-3 w-3" aria-hidden />
-      {t(`status.${status}`)}
+    <Badge variant={orderVariant[status]} className="gap-1 whitespace-normal">
+      <Icon className="h-3 w-3 shrink-0" aria-hidden />
+      <span className="min-w-0">{t(`status.${status}`)}</span>
     </Badge>
   )
 }

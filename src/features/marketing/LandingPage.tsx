@@ -91,17 +91,31 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="hero-panel rounded-2xl border border-white/12 bg-black/25 p-5 shadow-[var(--shadow-float)]">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cash">What sellers see today</p>
+          <div className="hero-panel rounded-2xl border border-white/12 bg-black/25 p-4 shadow-[var(--shadow-float)] sm:p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cash">
+              {t('marketing.previewTitle')}
+            </p>
             <div className="mt-4 space-y-3">
               {[
-                { label: 'New chat order', value: 'Dilani · Batik dress · Nugegoda', tone: 'text-on-ink' },
-                { label: 'Needs attention', value: 'Ask advance — high COD risk', tone: 'text-cash' },
-                { label: 'Cash waiting', value: '2 courier lines not matched yet', tone: 'text-white' },
+                {
+                  label: t('marketing.previewNew'),
+                  value: t('marketing.previewNewValue'),
+                  tone: 'text-on-ink',
+                },
+                {
+                  label: t('marketing.previewRisk'),
+                  value: t('marketing.previewRiskValue'),
+                  tone: 'text-cash',
+                },
+                {
+                  label: t('marketing.previewCash'),
+                  value: t('marketing.previewCashValue'),
+                  tone: 'text-white',
+                },
               ].map((row) => (
                 <div key={row.label} className="rounded-xl border border-white/10 bg-black/25 px-3.5 py-3">
-                  <p className="text-[11px] uppercase tracking-wide text-white/45">{row.label}</p>
-                  <p className={`mt-1 text-sm font-semibold ${row.tone}`}>{row.value}</p>
+                  <p className="text-[11px] tracking-wide text-white/45">{row.label}</p>
+                  <p className={`mt-1 text-sm font-semibold leading-snug ${row.tone}`}>{row.value}</p>
                 </div>
               ))}
             </div>

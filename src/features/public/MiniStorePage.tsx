@@ -14,11 +14,13 @@ export function MiniStorePage() {
     <div className="min-h-screen bg-paper">
       <header className="ink-wash px-4 py-12 text-white">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-4 flex justify-end">
-            <LanguageSwitcher compact className="border-white/20 bg-white/10" />
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <p className="min-w-0 truncate text-xs font-semibold uppercase tracking-[0.18em] text-cash">
+              Mini-store
+            </p>
+            <LanguageSwitcher compact className="shrink-0 border-white/20 bg-white/10" />
           </div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cash">Mini-store</p>
-          <h1 className="mt-2 font-display text-4xl font-extrabold">{tenant.businessName}</h1>
+          <h1 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl">{tenant.businessName}</h1>
           <p className="mt-2 max-w-xl text-mint/75">
             Order via WhatsApp — catalog for {slug?.replace('-', ' ') ?? 'this seller'}.
           </p>
