@@ -1,0 +1,213 @@
+@import "tailwindcss";
+
+/* Semantic tokens → Tailwind color utilities */
+@theme {
+  --font-display: "Outfit", "Noto Sans Sinhala", "Noto Sans Tamil", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Noto Sans Sinhala", "Noto Sans Tamil", ui-sans-serif, system-ui, sans-serif;
+  --font-si: "Noto Sans Sinhala", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-ta: "Noto Sans Tamil", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display-si: "Noto Sans Sinhala", "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display-ta: "Noto Sans Tamil", "Outfit", ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-lagoon: var(--lagoon);
+  --color-lagoon-bright: var(--lagoon-bright);
+  --color-mint: var(--mint);
+  --color-cash: var(--cash);
+  --color-cash-deep: var(--cash-deep);
+  --color-risk: var(--risk);
+  --color-ok: var(--ok);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-stone: var(--stone);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-surface: var(--surface);
+  --color-on-ink: var(--on-ink);
+
+  --shadow-desk: var(--shadow-desk-val);
+  --shadow-float: var(--shadow-float-val);
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+}
+
+/* Lagoon — default */
+:root,
+[data-theme="lagoon"] {
+  --ink: #071912;
+  --ink-soft: #0b2e26;
+  --lagoon: #0f766e;
+  --lagoon-bright: #14b8a6;
+  --mint: #5eead4;
+  --cash: #f5c542;
+  --cash-deep: #d4a017;
+  --risk: #e11d48;
+  --ok: #16a34a;
+  --paper: #f3f7f5;
+  --paper-2: #e6eeea;
+  --stone: #d0ddd6;
+  --muted: #5a6f67;
+  --line: #c5d4cc;
+  --surface: #ffffff;
+  --on-ink: #5eead4;
+  --hero-from: #0b2e26;
+  --hero-to: #071912;
+  --hero-glow-a: rgba(20, 184, 166, 0.2);
+  --hero-glow-b: rgba(245, 197, 66, 0.14);
+  --shadow-desk-val: 0 1px 0 rgba(7, 25, 18, 0.04), 0 12px 32px rgba(7, 25, 18, 0.08);
+  --shadow-float-val: 0 18px 48px rgba(7, 25, 18, 0.14);
+  color-scheme: light;
+}
+
+/* Night desk */
+[data-theme="night"] {
+  --ink: #e8f6f1;
+  --ink-soft: #b7d4cb;
+  --lagoon: #2dd4bf;
+  --lagoon-bright: #5eead4;
+  --mint: #99f6e4;
+  --cash: #fbbf24;
+  --cash-deep: #f59e0b;
+  --risk: #fb7185;
+  --ok: #4ade80;
+  --paper: #061411;
+  --paper-2: #0c221c;
+  --stone: #1a3a32;
+  --muted: #8eaaa1;
+  --line: #1f3f36;
+  --surface: #0d1f1a;
+  --on-ink: #99f6e4;
+  --hero-from: #04100d;
+  --hero-to: #020908;
+  --hero-glow-a: rgba(45, 212, 191, 0.18);
+  --hero-glow-b: rgba(251, 191, 36, 0.12);
+  --shadow-desk-val: 0 1px 0 rgba(255, 255, 255, 0.04), 0 12px 32px rgba(0, 0, 0, 0.35);
+  --shadow-float-val: 0 18px 48px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+/* Market day — bright paper, indigo ink, papaya accent */
+[data-theme="market"] {
+  --ink: #1e2a4a;
+  --ink-soft: #2a3a5c;
+  --lagoon: #2563eb;
+  --lagoon-bright: #3b82f6;
+  --mint: #dbeafe;
+  --cash: #ff8a3d;
+  --cash-deep: #ea580c;
+  --risk: #e11d48;
+  --ok: #059669;
+  --paper: #f7f8fc;
+  --paper-2: #eef1f8;
+  --stone: #d8deea;
+  --muted: #5b6785;
+  --line: #d0d7e6;
+  --surface: #ffffff;
+  --on-ink: #ff8a3d;
+  --hero-from: #1e2a4a;
+  --hero-to: #152038;
+  --hero-glow-a: rgba(37, 99, 235, 0.22);
+  --hero-glow-b: rgba(255, 138, 61, 0.16);
+  --shadow-desk-val: 0 1px 0 rgba(30, 42, 74, 0.04), 0 12px 32px rgba(30, 42, 74, 0.08);
+  --shadow-float-val: 0 18px 48px rgba(30, 42, 74, 0.14);
+  color-scheme: light;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--color-ink);
+    background: var(--color-paper);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  html[lang="si"] body {
+    font-family: var(--font-si);
+  }
+
+  html[lang="ta"] body {
+    font-family: var(--font-ta);
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+  }
+
+  html[lang="si"] h1,
+  html[lang="si"] h2,
+  html[lang="si"] h3,
+  html[lang="si"] .font-display {
+    font-family: var(--font-display-si);
+  }
+
+  html[lang="ta"] h1,
+  html[lang="ta"] h2,
+  html[lang="ta"] h3,
+  html[lang="ta"] .font-display {
+    font-family: var(--font-display-ta);
+  }
+
+  input, textarea, select, button {
+    font-family: inherit;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-lagoon-bright) 40%, white);
+    color: var(--color-ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  .desk-grid {
+    background-image:
+      linear-gradient(color-mix(in oklab, var(--color-ink) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--color-ink) 6%, transparent) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .ink-wash {
+    background:
+      radial-gradient(ellipse 80% 55% at 10% -10%, var(--hero-glow-a), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 90% 0%, var(--hero-glow-b), transparent 50%),
+      linear-gradient(180deg, var(--hero-from) 0%, var(--hero-to) 100%);
+  }
+
+  .paper-noise {
+    background-color: var(--color-paper);
+    background-image:
+      radial-gradient(circle at 20% 20%, color-mix(in oklab, var(--color-lagoon) 8%, transparent), transparent 35%),
+      radial-gradient(circle at 80% 0%, color-mix(in oklab, var(--color-cash) 8%, transparent), transparent 30%);
+  }
+}
