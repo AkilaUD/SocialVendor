@@ -1,10 +1,17 @@
 import { toast } from 'sonner'
-import { PageHeader } from '@/components/common/PageHeader'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Home, PhoneOff, MapPin, ThumbsDown } from 'lucide-react'
+import { Stamp } from '@/components/kade/Stamp'
+import { BigButton } from '@/components/kade/BigButton'
 import { useAppStore } from '@/stores/useAppStore'
 import { useT } from '@/i18n'
 import type { ReturnRecord } from '@/types'
+
+const reasons = [
+  { id: 'home', icon: Home, label: 'Not at home' },
+  { id: 'no', icon: ThumbsDown, label: 'Said no' },
+  { id: 'addr', icon: MapPin, label: 'Wrong address' },
+  { id: 'phone', icon: PhoneOff, label: 'Phone off' },
+] as const
 
 export function ReturnsPage() {
   const t = useT()
@@ -13,56 +20,58 @@ export function ReturnsPage() {
 
   const grade = (id: string, g: NonNullable<ReturnRecord['grade']>) => {
     updateReturn(id, { grade: g, status: 'inspected' })
-    toast.success(`Graded ${g}`)
+    toast.success(t('kade.correct'))
   }
 
   return (
-    <div>
-      <PageHeader
-        eyebrow={t('returns.eyebrow')}
-        title={t('returns.title')}
-        description={t('returns.description')}
-        tip={t('returns.tip')}
-      />
+    <div className="space-y-4">
+      <h1 className="font-display text-3xl font-extrabold">{t('kade.cameBack')}</h1>
+
+      <div className="grid grid-cols-2 gap-3">
+        {reasons.map((r) => (
+          <div
+            key={r.id}
+            className="flex min-h-28 flex-col items-center justify-center gap-2 rounded-xl border-2 border-ink bg-surface p-3 text-center"
+          >
+            <r.icon className="h-10 w-10 text-risk" strokeWidth={2.5} />
+            <p className="text-sm font-extrabold leading-snug">{r.label}</p>
+          </div>
+        ))}
+      </div>
 
       <div className="space-y-3">
         {returns.map((r) => (
-          <div key={r.id} className="rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow-desk)]">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="font-display text-lg font-bold">{r.orderNumber}</p>
-                <p className="text-sm text-muted">
-                  {r.type.toUpperCase()} · {r.reason}
-                  {r.waybill ? ` · ${r.waybill}` : ''}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Badge variant="outline">{r.status.replace('_', ' ')}</Badge>
-                {r.grade ? <Badge variant="lagoon">Grade {r.grade}</Badge> : null}
-              </div>
+          <div key={r.id} className="parcel-tag relative p-4">
+            <p className="font-money text-sm text-muted">{r.orderNumber}</p>
+            <p className="mt-1 text-lg font-extrabold">{r.reason}</p>
+            <div className="absolute right-3 top-3">
+              <Stamp label={t('kade.stampBack')} kind="returned" show />
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button size="sm" variant="outline" className="min-h-10" onClick={() => grade(r.id, 'A')}>
-                {t('returns.gradeA')}
-              </Button>
-              <Button size="sm" variant="outline" className="min-h-10" onClick={() => grade(r.id, 'B')}>
-                {t('returns.gradeB')}
-              </Button>
-              <Button size="sm" variant="outline" className="min-h-10" onClick={() => grade(r.id, 'C')}>
-                {t('returns.gradeC')}
-              </Button>
-              <Button
-                size="sm"
-                variant="lagoon"
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              {(['A', 'B', 'C'] as const).map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  className="min-h-14 rounded-xl border-2 border-ink bg-paper text-lg font-extrabold"
+                  onClick={() => grade(r.id, g)}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
+            <div className="mt-2">
+              <BigButton
+                tone="done"
+                speakText={t('returns.complete')}
                 onClick={() => {
                   updateReturn(r.id, {
                     status: r.grade === 'C' ? 'written_off' : 'restocked',
                   })
-                  toast.success(r.grade === 'C' ? 'Written off' : 'Restocked')
+                  toast.success(t('common.done'))
                 }}
               >
                 {t('returns.complete')}
-              </Button>
+              </BigButton>
             </div>
           </div>
         ))}

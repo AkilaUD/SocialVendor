@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageSquareText,
   MoreHorizontal,
   Package,
   Receipt,
@@ -46,10 +47,10 @@ const primaryNav: NavItem[] = [
 ]
 
 const simpleBottomNav: NavItem[] = [
-  { to: '/app', labelKey: 'nav.today', icon: LayoutDashboard, end: true },
-  { to: '/app/orders', labelKey: 'nav.orders', icon: ShoppingBag },
-  { to: '/app/dispatch', labelKey: 'nav.dispatch', icon: Truck },
+  { to: '/app', labelKey: 'nav.chats', icon: MessageSquareText, end: true },
+  { to: '/app/orders', labelKey: 'nav.parcels', icon: Package },
   { to: '/app/cod', labelKey: 'nav.money', icon: Banknote },
+  { to: '/app/settings', labelKey: 'nav.shop', icon: Settings },
 ]
 
 const moreItems: NavItem[] = [
@@ -280,7 +281,7 @@ export function AppLayout() {
         <main
           className={cn(
             'min-w-0 flex-1 px-4 py-5 md:px-6 md:py-6',
-            simpleMode && 'pb-28 lg:pb-6',
+            simpleMode && 'pb-36 lg:pb-6',
           )}
         >
           <Outlet />
@@ -352,37 +353,63 @@ export function AppLayout() {
         : null}
 
       {simpleMode ? (
-        <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur lg:hidden">
-          <div className="grid grid-cols-5 gap-1">
-            {simpleBottomNav.map((item) => (
+        <nav className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-ink bg-surface px-1 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 lg:hidden">
+          <div className="grid grid-cols-5 items-end gap-0.5">
+            {simpleBottomNav.slice(0, 2).map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.end}
                 className={({ isActive }) =>
                   cn(
-                    'flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-[10px] font-semibold leading-tight sm:text-[11px]',
-                    isActive ? 'bg-lagoon/15 text-lagoon' : 'text-muted',
+                    'flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-[10px] font-extrabold leading-tight',
+                    isActive ? 'bg-cash text-ink' : 'text-ink',
                   )
                 }
               >
-                <item.icon className="h-5 w-5 shrink-0" />
+                <item.icon className="h-6 w-6 shrink-0" strokeWidth={2.5} />
                 <span className="max-w-full whitespace-normal text-center line-clamp-2">
                   {t(item.labelKey)}
                 </span>
               </NavLink>
             ))}
-            <button
-              type="button"
-              onClick={() => setMoreOpen(true)}
-              className="flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-[10px] font-semibold leading-tight text-muted sm:text-[11px]"
+            <NavLink
+              to="/app/orders/new"
+              className={({ isActive }) =>
+                cn(
+                  'parcel-tag relative -mt-4 flex min-h-[4.5rem] flex-col items-center justify-center gap-0.5 border-2 border-ink bg-cash px-1 py-2 text-[10px] font-extrabold text-ink shadow-[var(--shadow-float)]',
+                  isActive && 'ring-2 ring-ink',
+                )
+              }
             >
-              <MoreHorizontal className="h-5 w-5 shrink-0" />
-              <span className="max-w-full whitespace-normal text-center line-clamp-2">
-                {t('common.more')}
-              </span>
-            </button>
+              <ShoppingBag className="h-6 w-6" strokeWidth={2.5} />
+              <span className="line-clamp-2 text-center leading-tight">{t('nav.newOrder')}</span>
+            </NavLink>
+            {simpleBottomNav.slice(2).map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  cn(
+                    'flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-[10px] font-extrabold leading-tight',
+                    isActive ? 'bg-cash text-ink' : 'text-ink',
+                  )
+                }
+              >
+                <item.icon className="h-6 w-6 shrink-0" strokeWidth={2.5} />
+                <span className="max-w-full whitespace-normal text-center line-clamp-2">
+                  {t(item.labelKey)}
+                </span>
+              </NavLink>
+            ))}
           </div>
+          <button
+            type="button"
+            onClick={() => setMoreOpen(true)}
+            className="mx-auto mt-1 flex items-center gap-1 text-xs font-bold text-muted"
+          >
+            <MoreHorizontal className="h-4 w-4" /> {t('common.more')}
+          </button>
         </nav>
       ) : null}
 

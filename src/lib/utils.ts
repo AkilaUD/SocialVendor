@@ -6,11 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatLkr(amount: number) {
-  return new Intl.NumberFormat('en-LK', {
-    style: 'currency',
-    currency: 'LKR',
+  return `Rs. ${new Intl.NumberFormat('en-LK', {
     maximumFractionDigits: 0,
-  }).format(amount)
+  }).format(amount)}`
 }
 
 export function formatPhone(phone: string) {

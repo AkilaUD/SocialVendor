@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom'
-import { PageHeader } from '@/components/common/PageHeader'
+import { Camera } from 'lucide-react'
+import { toast } from 'sonner'
+import { BigButton } from '@/components/kade/BigButton'
 import { ProductSwatch } from '@/components/common/ProductSwatch'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Stamp } from '@/components/kade/Stamp'
 import { useAppStore } from '@/stores/useAppStore'
 import { useT } from '@/i18n'
 import { formatLkr } from '@/lib/utils'
@@ -12,47 +12,41 @@ export function ProductsPage() {
   const products = useAppStore((s) => s.products)
 
   return (
-    <div>
-      <PageHeader
-        eyebrow={t('products.eyebrow')}
-        title={t('products.title')}
-        description={t('products.description')}
-        actions={
-          <Button asChild variant="outline" className="min-h-11">
-            <Link to="/app/inventory">{t('products.openStock')}</Link>
-          </Button>
-        }
-      />
+    <div className="space-y-4">
+      <h1 className="font-display text-3xl font-extrabold">{t('nav.products')}</h1>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <BigButton
+        tone="primary"
+        icon={<Camera className="h-7 w-7" />}
+        speakText={t('products.title')}
+        onClick={() => toast.message('Camera — mock. Backend ask: product photo capture.')}
+      >
+        {t('products.title')}
+      </BigButton>
+
+      <div className="grid grid-cols-2 gap-3">
         {products.map((p) => {
           const available = p.variants.reduce((s, v) => s + (v.stockOnHand - v.stockReserved), 0)
-          const low = p.variants.some((v) => v.stockOnHand - v.stockReserved <= v.reorderPoint)
           const from = Math.min(...p.variants.map((v) => v.price))
+          const soldOut = available <= 0
           return (
-            <div key={p.id} className="overflow-hidden rounded-xl border border-line bg-surface shadow-[var(--shadow-desk)]">
-              <ProductSwatch title={p.category} hue={p.imageHue} className="h-36" />
-              <div className="p-4">
-                <div className="flex flex-wrap gap-1.5">
-                  {p.isBook ? <Badge variant="lagoon">{t('products.book')}</Badge> : null}
-                  {p.isMadeToOrder ? <Badge variant="cash">{t('products.madeToOrder')}</Badge> : null}
-                  {low ? <Badge variant="risk">{t('products.lowStock')}</Badge> : null}
+            <div key={p.id} className="relative overflow-hidden rounded-xl border-2 border-ink bg-surface">
+              <ProductSwatch title={p.category} hue={p.imageHue} className="h-32" />
+              <div className="absolute right-2 top-2 rounded-md border-2 border-ink bg-cash px-2 py-1 font-money text-sm text-ink">
+                {formatLkr(from)}
+              </div>
+              {soldOut ? (
+                <div className="absolute left-2 top-2">
+                  <Stamp label={t('kade.stampBack')} kind="returned" show />
                 </div>
-                <h3 className="mt-2 font-display text-xl font-bold">{p.title}</h3>
-                <p className="mt-1 line-clamp-2 text-sm text-muted">{p.description}</p>
-                <div className="mt-4 flex items-end justify-between">
-                  <div>
-                    <p className="text-xs text-muted">{t('products.from')}</p>
-                    <p className="font-semibold">{formatLkr(from)}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-muted">{t('products.available')}</p>
-                    <p className="font-semibold">{available} {t('products.units')}</p>
-                  </div>
+              ) : null}
+              <div className="p-3">
+                <p className="line-clamp-2 text-base font-extrabold leading-snug">{p.title}</p>
+                <div className="mt-2 flex gap-1">
+                  {Array.from({ length: Math.min(5, Math.max(0, available)) }).map((_, i) => (
+                    <span key={i} className="h-3 w-3 rounded-sm border border-ink bg-ok" />
+                  ))}
                 </div>
-                {p.isBook && p.variants[0]?.isbn ? (
-                  <p className="mt-3 text-xs text-muted">ISBN {p.variants[0].isbn} · {p.variants[0].author}</p>
-                ) : null}
               </div>
             </div>
           )
