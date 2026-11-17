@@ -127,46 +127,58 @@ export function OrderDetailPage() {
             <h2 className="font-display text-lg font-bold">{t('orderDetail.lines')}</h2>
             <div className="mt-3 divide-y divide-line">
               {order.lines.map((l) => (
-                <div key={l.id} className="flex items-center justify-between gap-3 py-3">
-                  <div>
+                <div
+                  key={l.id}
+                  className="flex flex-col gap-0.5 py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3"
+                >
+                  <div className="min-w-0">
                     <p className="text-sm font-semibold">{l.productTitle}</p>
                     <p className="text-xs text-muted">
                       {l.variantName} · {l.sku} · ×{l.qty}
                     </p>
                   </div>
-                  <p className="text-sm font-semibold">{formatLkr(l.unitPrice * l.qty)}</p>
+                  <p className="shrink-0 text-sm font-semibold tabular-nums">
+                    {formatLkr(l.unitPrice * l.qty)}
+                  </p>
                 </div>
               ))}
             </div>
-            <div className="mt-3 space-y-1 border-t border-line pt-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted">{t('orderDetail.subtotal')}</span>
-                <span>{formatLkr(order.subtotal)}</span>
+            <div className="mt-3 space-y-2 border-t border-line pt-3 text-sm">
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+                <span className="min-w-0 text-muted">{t('orderDetail.subtotal')}</span>
+                <span className="shrink-0 font-semibold tabular-nums">{formatLkr(order.subtotal)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted">{t('orderDetail.delivery')}</span>
-                <span>{formatLkr(order.deliveryFee)}</span>
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+                <span className="min-w-0 text-muted">{t('orderDetail.delivery')}</span>
+                <span className="shrink-0 font-semibold tabular-nums">{formatLkr(order.deliveryFee)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted">{t('orderDetail.discount')}</span>
-                <span>-{formatLkr(order.discount)}</span>
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+                <span className="min-w-0 text-muted">{t('orderDetail.discount')}</span>
+                <span className="shrink-0 font-semibold tabular-nums">-{formatLkr(order.discount)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted">{t('orderDetail.bankPaid')}</span>
-                <span>{formatLkr(order.advancePaid)}</span>
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+                <span className="min-w-0 text-muted">{t('orderDetail.bankPaid')}</span>
+                <span className="shrink-0 font-semibold tabular-nums">{formatLkr(order.advancePaid)}</span>
               </div>
-              <div className="flex justify-between font-bold">
-                <span>{t('orderDetail.codDue')}</span>
-                <span>{formatLkr(order.codAmount)}</span>
+              <div className="mt-1 flex flex-col gap-0.5 rounded-lg bg-cash/15 px-3 py-2.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+                <span className="min-w-0 text-base font-bold">{t('orderDetail.codDue')}</span>
+                <span className="shrink-0 text-lg font-extrabold tabular-nums">
+                  {formatLkr(order.codAmount)}
+                </span>
               </div>
             </div>
           </div>
 
           <div className="rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow-desk)]">
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="font-display text-lg font-bold">{t('orderDetail.bankPayments')}</h2>
-              <Button size="sm" variant="cash" className="min-h-10" onClick={() => setSlipOpen(true)}>
-                <Building2 className="h-3.5 w-3.5" /> {t('orderDetail.depositSlip')}
+              <Button
+                size="sm"
+                variant="cash"
+                className="w-full sm:w-auto"
+                onClick={() => setSlipOpen(true)}
+              >
+                <Building2 className="h-3.5 w-3.5 shrink-0" /> {t('orderDetail.depositSlip')}
               </Button>
             </div>
             {payments.length === 0 ? (
@@ -176,9 +188,9 @@ export function OrderDetailPage() {
                 {payments.map((p) => (
                   <div
                     key={p.id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line px-3 py-2"
+                    className="flex flex-col gap-2 rounded-lg border border-line px-3 py-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
                   >
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-semibold">
                         {formatLkr(p.amount)} · {t(`pay.${p.purpose}`)}
                       </p>
@@ -198,16 +210,18 @@ export function OrderDetailPage() {
                 ))}
               </div>
             )}
-            <div className="mt-4 rounded-lg bg-paper p-3 text-xs text-muted">
+            <div className="mt-4 break-words rounded-lg bg-paper p-3 text-xs text-muted">
               {t('orderDetail.shareAccount')}: {tenant.bankAccount.bankName} ·{' '}
               {tenant.bankAccount.accountNumber} · {tenant.bankAccount.branch}
             </div>
           </div>
 
           {order.notes ? (
-            <div className="rounded-xl border border-dashed border-line bg-paper p-4 text-sm">
-              <p className="text-xs font-semibold uppercase text-muted">{t('orderDetail.notes')}</p>
-              <p className="mt-1">{order.notes}</p>
+            <div className="rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow-desk)]">
+              <p className="text-xs font-semibold tracking-wide text-muted">{t('orderDetail.notes')}</p>
+              <div className="mt-2 rounded-lg border border-dashed border-line bg-paper p-3 text-sm">
+                <p className="break-words">{order.notes}</p>
+              </div>
             </div>
           ) : null}
         </div>
@@ -216,28 +230,36 @@ export function OrderDetailPage() {
           <div className="rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow-desk)]">
             <h2 className="font-display text-lg font-bold">{t('orderDetail.actions')}</h2>
             <div className="mt-3 flex flex-col gap-2">
-              <Button variant="cash" className="min-h-11" onClick={() => setSlipOpen(true)}>
+              <Button
+                variant="cash"
+                className="min-h-12 w-full px-4 py-3 text-base"
+                onClick={() => setSlipOpen(true)}
+              >
                 {t('orderDetail.bankDeposit')}
               </Button>
               {nextKey ? (
-                <Button variant="lagoon" className="min-h-11" onClick={advance}>
+                <Button
+                  variant="lagoon"
+                  className="min-h-12 w-full px-4 py-3 text-base"
+                  onClick={advance}
+                >
                   {t(nextKey)}
                 </Button>
               ) : null}
               {order.status === 'new' && order.riskLevel !== 'low' ? (
-                <Button variant="outline" className="min-h-11" onClick={hold}>
+                <Button variant="outline" className="min-h-12 w-full px-4 py-3" onClick={hold}>
                   {t('orderDetail.holdAdvance')}
                 </Button>
               ) : null}
               {order.waybill ? (
-                <Button asChild variant="soft" className="min-h-11">
+                <Button asChild variant="soft" className="min-h-11 w-full">
                   <Link to={`/track/${order.waybill}`}>{t('orderDetail.tracking')}</Link>
                 </Button>
               ) : null}
-              <Button asChild variant="ghost" className="min-h-11">
+              <Button asChild variant="ghost" className="min-h-11 w-full">
                 <Link to={`/app/customers/${order.customerId}`}>{t('orderDetail.openCustomer')}</Link>
               </Button>
-              <Button asChild variant="ghost" className="min-h-11">
+              <Button asChild variant="ghost" className="min-h-11 w-full">
                 <Link to="/app/payments">{t('orderDetail.allSlips')}</Link>
               </Button>
             </div>

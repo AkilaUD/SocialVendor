@@ -20,6 +20,7 @@ import {
   X,
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { ThemeSwitcher } from '@/components/common/ThemeSwitcher'
@@ -198,10 +199,11 @@ export function AppLayout() {
       </aside>
 
       <div className="flex min-h-screen flex-col">
-        <header className="sticky top-0 z-30 flex min-h-14 items-center justify-between gap-2 border-b border-line bg-paper/90 px-3 backdrop-blur sm:gap-3 sm:px-4 md:px-6">
+        <header className="sticky top-0 z-30 flex min-h-14 items-center justify-between gap-2 border-b border-line bg-paper/90 px-3 py-2 backdrop-blur sm:gap-3 sm:px-4 md:px-6">
           <div className="flex min-w-0 items-center gap-2">
             <button
-              className="min-h-11 min-w-11 shrink-0 rounded-md p-2 hover:bg-paper-2 lg:hidden"
+              type="button"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md hover:bg-paper-2 lg:hidden"
               onClick={() => setMobileOpen(true)}
               aria-label="Open navigation"
             >
@@ -230,7 +232,7 @@ export function AppLayout() {
               asChild
               size="icon"
               variant="cash"
-              className="min-h-11 min-w-11 sm:hidden"
+              className="sm:hidden"
               aria-label={t('nav.quickOrder')}
             >
               <Link to="/app/orders/new">
@@ -241,7 +243,7 @@ export function AppLayout() {
               asChild
               size={simpleMode ? 'default' : 'sm'}
               variant="cash"
-              className="hidden min-h-11 whitespace-nowrap sm:inline-flex"
+              className="hidden sm:inline-flex"
             >
               <Link to="/app/orders/new">{t('nav.quickOrder')}</Link>
             </Button>
@@ -249,8 +251,8 @@ export function AppLayout() {
               <Button
                 size="icon"
                 variant="outline"
-                className="min-h-11 min-w-11"
                 aria-label="Notifications"
+                aria-expanded={notifOpen}
                 onClick={() => setNotifOpen((v) => !v)}
               >
                 <Bell className="h-4 w-4" />
@@ -260,50 +262,10 @@ export function AppLayout() {
                   {unread}
                 </span>
               ) : null}
-              <AnimatePresence>
-                {notifOpen ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    className="absolute right-0 mt-2 w-[min(100vw-2rem,22rem)] overflow-hidden rounded-xl border border-line bg-surface shadow-[var(--shadow-float)]"
-                  >
-                    <div className="flex items-center justify-between border-b border-line px-4 py-3">
-                      <p className="text-sm font-semibold">Notifications</p>
-                      <button
-                        className="text-xs font-medium text-lagoon hover:underline"
-                        onClick={markAllNotificationsRead}
-                      >
-                        Mark all read
-                      </button>
-                    </div>
-                    <div className="max-h-80 overflow-y-auto">
-                      {notifications.map((n) => (
-                        <button
-                          key={n.id}
-                          className={cn(
-                            'block w-full border-b border-line/70 px-4 py-3 text-left hover:bg-paper',
-                            !n.read && 'bg-lagoon/10',
-                          )}
-                          onClick={() => {
-                            markNotificationRead(n.id)
-                            setNotifOpen(false)
-                            if (n.href) navigate(n.href)
-                          }}
-                        >
-                          <p className="text-sm font-semibold">{n.title}</p>
-                          <p className="mt-0.5 text-xs text-muted">{n.body}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
             </div>
             <Button
               size="icon"
               variant="ghost"
-              className="min-h-11 min-w-11"
               aria-label="Sign out"
               onClick={() => {
                 logout()
@@ -327,6 +289,68 @@ export function AppLayout() {
 
       <CoachOverlay />
 
+      {typeof document !== 'undefined'
+        ? createPortal(
+            <AnimatePresence>
+              {notifOpen ? (
+                <>
+                  <motion.button
+                    key="notif-backdrop"
+                    type="button"
+                    aria-label="Close notifications"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[60] bg-ink/25"
+                    onClick={() => setNotifOpen(false)}
+                  />
+                  <motion.div
+                    key="notif-panel"
+                    role="dialog"
+                    aria-label="Notifications"
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    className="fixed inset-x-3 top-[4.25rem] z-[70] max-h-[min(70vh,28rem)] overflow-hidden rounded-xl border border-line bg-surface shadow-[var(--shadow-float)] sm:inset-x-auto sm:right-4 sm:w-[22rem]"
+                  >
+                    <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
+                      <p className="min-w-0 text-sm font-semibold">Notifications</p>
+                      <button
+                        type="button"
+                        className="shrink-0 text-xs font-medium text-lagoon hover:underline"
+                        onClick={markAllNotificationsRead}
+                      >
+                        Mark all read
+                      </button>
+                    </div>
+                    <div className="max-h-[min(60vh,24rem)] overflow-y-auto overscroll-contain">
+                      {notifications.map((n) => (
+                        <button
+                          key={n.id}
+                          type="button"
+                          className={cn(
+                            'block w-full border-b border-line/70 px-4 py-3 text-left hover:bg-paper',
+                            !n.read && 'bg-lagoon/10',
+                          )}
+                          onClick={() => {
+                            markNotificationRead(n.id)
+                            setNotifOpen(false)
+                            if (n.href) navigate(n.href)
+                          }}
+                        >
+                          <p className="text-sm font-semibold">{n.title}</p>
+                          <p className="mt-0.5 text-xs text-muted">{n.body}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                </>
+              ) : null}
+            </AnimatePresence>,
+            document.body,
+          )
+        : null}
+
       {simpleMode ? (
         <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur lg:hidden">
           <div className="grid grid-cols-5 gap-1">
@@ -337,22 +361,26 @@ export function AppLayout() {
                 end={item.end}
                 className={({ isActive }) =>
                   cn(
-                    'flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[11px] font-semibold',
+                    'flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-[10px] font-semibold leading-tight sm:text-[11px]',
                     isActive ? 'bg-lagoon/15 text-lagoon' : 'text-muted',
                   )
                 }
               >
-                <item.icon className="h-5 w-5" />
-                <span className="truncate">{t(item.labelKey)}</span>
+                <item.icon className="h-5 w-5 shrink-0" />
+                <span className="max-w-full whitespace-normal text-center line-clamp-2">
+                  {t(item.labelKey)}
+                </span>
               </NavLink>
             ))}
             <button
               type="button"
               onClick={() => setMoreOpen(true)}
-              className="flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[11px] font-semibold text-muted"
+              className="flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-[10px] font-semibold leading-tight text-muted sm:text-[11px]"
             >
-              <MoreHorizontal className="h-5 w-5" />
-              <span>{t('common.more')}</span>
+              <MoreHorizontal className="h-5 w-5 shrink-0" />
+              <span className="max-w-full whitespace-normal text-center line-clamp-2">
+                {t('common.more')}
+              </span>
             </button>
           </div>
         </nav>
