@@ -47,27 +47,10 @@ export function SettingsPage() {
     <div>
       <PageHeader
         eyebrow={t('settings.eyebrow')}
-        title={t('nav.shop')}
+        title={t('settings.title')}
         description={t('settings.description')}
         tip={t('settings.tip')}
       />
-
-      <div className="mb-5 grid grid-cols-2 gap-3">
-        <a
-          href={`tel:${tenant.phone}`}
-          className="flex min-h-20 flex-col items-center justify-center rounded-xl border-2 border-ink bg-ok text-lg font-extrabold text-white"
-        >
-          Call us
-        </a>
-        <a
-          href={`https://wa.me/94${tenant.phone.replace(/\D/g, '').slice(-9)}`}
-          target="_blank"
-          rel="noreferrer"
-          className="flex min-h-20 flex-col items-center justify-center rounded-xl border-2 border-ink bg-cash text-lg font-extrabold text-ink"
-        >
-          WhatsApp us
-        </a>
-      </div>
 
       <div className="mb-5 flex max-w-full gap-1 overflow-x-auto pb-1">
         {tabs.map((item) => (

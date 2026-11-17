@@ -28,7 +28,7 @@ export const useLocaleStore = create<LocaleState>()(
       },
       pickLanguage: (locale) => {
         applyDocumentLang(locale)
-        set({ locale, languagePicked: true, simpleMode: true })
+        set({ locale, languagePicked: true })
       },
       setSimpleMode: (simpleMode) => set({ simpleMode }),
     }),
