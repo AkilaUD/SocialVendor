@@ -23,6 +23,8 @@ import { useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
+import { Pictogram } from '@/components/kade/Pictogram'
+import type { PictogramId } from '@/assets/pictograms'
 import { ThemeSwitcher } from '@/components/common/ThemeSwitcher'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { CoachOverlay } from '@/components/common/CoachOverlay'
@@ -38,6 +40,13 @@ type NavItem = {
   end?: boolean
 }
 
+type EasyNavItem = {
+  to: string
+  labelKey: string
+  pictogram: PictogramId
+  end?: boolean
+}
+
 const primaryNav: NavItem[] = [
   { to: '/app', labelKey: 'nav.today', icon: LayoutDashboard, end: true },
   { to: '/app/orders', labelKey: 'nav.orders', icon: ShoppingBag },
@@ -45,11 +54,15 @@ const primaryNav: NavItem[] = [
   { to: '/app/cod', labelKey: 'nav.cod', icon: Banknote },
 ]
 
-const simpleBottomNav: NavItem[] = [
-  { to: '/app', labelKey: 'nav.today', icon: LayoutDashboard, end: true },
-  { to: '/app/orders', labelKey: 'nav.orders', icon: ShoppingBag },
-  { to: '/app/dispatch', labelKey: 'nav.dispatch', icon: Truck },
-  { to: '/app/cod', labelKey: 'nav.money', icon: Banknote },
+/** Core Easy desk: Today · Parcels · New · Pack · Money (More via header). */
+const easyNavLeft: EasyNavItem[] = [
+  { to: '/app', labelKey: 'nav.today', pictogram: 'purse', end: true },
+  { to: '/app/orders', labelKey: 'nav.orders', pictogram: 'parcel' },
+]
+
+const easyNavRight: EasyNavItem[] = [
+  { to: '/app/dispatch', labelKey: 'nav.dispatch', pictogram: 'bike' },
+  { to: '/app/cod', labelKey: 'nav.money', pictogram: 'coin' },
 ]
 
 const moreItems: NavItem[] = [
@@ -204,10 +217,14 @@ export function AppLayout() {
             <button
               type="button"
               className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md hover:bg-paper-2 lg:hidden"
-              onClick={() => setMobileOpen(true)}
-              aria-label="Open navigation"
+              onClick={() => (simpleMode ? setMoreOpen(true) : setMobileOpen(true))}
+              aria-label={simpleMode ? t('common.more') : 'Open navigation'}
             >
-              <Menu className="h-5 w-5" />
+              {simpleMode ? (
+                <MoreHorizontal className="h-5 w-5" strokeWidth={2.5} />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </button>
             <div className="hidden min-w-0 sm:block">
               <p className="truncate text-xs text-muted">
@@ -352,36 +369,52 @@ export function AppLayout() {
         : null}
 
       {simpleMode ? (
-        <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur lg:hidden">
-          <div className="grid grid-cols-5 gap-1">
-            {simpleBottomNav.map((item) => (
+        <nav className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-ink bg-surface px-1 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 lg:hidden">
+          <div className="grid grid-cols-5 items-end gap-0.5">
+            {easyNavLeft.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.end}
                 className={({ isActive }) =>
                   cn(
-                    'flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-[10px] font-semibold leading-tight sm:text-[11px]',
-                    isActive ? 'bg-lagoon/15 text-lagoon' : 'text-muted',
+                    'flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-[10px] font-extrabold leading-tight sm:text-[11px]',
+                    isActive ? 'bg-cash text-ink' : 'text-muted',
                   )
                 }
               >
-                <item.icon className="h-5 w-5 shrink-0" />
+                <Pictogram id={item.pictogram} className="h-8 w-8" />
                 <span className="max-w-full whitespace-normal text-center line-clamp-2">
                   {t(item.labelKey)}
                 </span>
               </NavLink>
             ))}
-            <button
-              type="button"
-              onClick={() => setMoreOpen(true)}
-              className="flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-[10px] font-semibold leading-tight text-muted sm:text-[11px]"
+            <Link
+              to="/app/orders/new"
+              className="-mt-5 flex min-h-[4.5rem] flex-col items-center justify-center rounded-2xl border-2 border-ink bg-cash px-1 py-2 text-[10px] font-extrabold text-ink shadow-[var(--shadow-desk)] sm:text-[11px]"
+              aria-label={t('today.newOrder')}
             >
-              <MoreHorizontal className="h-5 w-5 shrink-0" />
-              <span className="max-w-full whitespace-normal text-center line-clamp-2">
-                {t('common.more')}
-              </span>
-            </button>
+              <Pictogram id="chat" className="h-9 w-9" />
+              <span className="mt-0.5 max-w-full text-center line-clamp-2">{t('today.newOrder')}</span>
+            </Link>
+            {easyNavRight.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) =>
+                  cn(
+                    'flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-[10px] font-extrabold leading-tight sm:text-[11px]',
+                    isActive ? 'bg-cash text-ink' : 'text-muted',
+                  )
+                }
+              >
+                <Pictogram id={item.pictogram} className="h-8 w-8" />
+                <span className="max-w-full whitespace-normal text-center line-clamp-2">
+                  {t(item.labelKey)}
+                </span>
+              </NavLink>
+            ))}
           </div>
         </nav>
       ) : null}
@@ -402,10 +435,10 @@ export function AppLayout() {
               initial={{ y: 40, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 40, opacity: 0 }}
-              className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border border-line bg-surface p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[var(--shadow-float)] lg:hidden"
+              className="fixed inset-x-0 bottom-0 z-50 rounded-t-2xl border-2 border-ink bg-surface p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[var(--shadow-float)] lg:hidden"
             >
               <div className="mb-3 flex items-center justify-between">
-                <p className="font-display text-lg font-bold">{t('common.more')}</p>
+                <p className="text-lg font-extrabold">{t('common.more')}</p>
                 <button
                   type="button"
                   className="min-h-11 min-w-11 rounded-md p-2 hover:bg-paper-2"
@@ -414,13 +447,26 @@ export function AppLayout() {
                   <X className="h-5 w-5" />
                 </button>
               </div>
+              <Link
+                to="/app/settings?tab=language"
+                onClick={() => setMoreOpen(false)}
+                className="mb-3 flex min-h-14 items-center gap-3 rounded-xl border-2 border-ink bg-cash/30 px-3 py-3"
+              >
+                <Pictogram id="speaker" className="h-10 w-10" />
+                <div className="min-w-0">
+                  <p className="font-extrabold">{t('simple.openEasySettings')}</p>
+                  <p className="text-sm text-muted">
+                    {simpleMode ? t('simple.on') : t('simple.off')}
+                  </p>
+                </div>
+              </Link>
               <div className="grid grid-cols-2 gap-2">
                 {moreItems.map((item) => (
                   <Link
                     key={item.to}
                     to={item.to}
                     onClick={() => setMoreOpen(false)}
-                    className="flex min-h-14 items-center gap-3 rounded-xl border border-line bg-paper px-3 py-3 text-sm font-semibold"
+                    className="flex min-h-14 items-center gap-3 rounded-xl border-2 border-ink bg-paper px-3 py-3 text-sm font-extrabold"
                   >
                     <item.icon className="h-5 w-5 text-lagoon" />
                     {t(item.labelKey)}

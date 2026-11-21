@@ -1,96 +1,120 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Search, ShoppingBag } from 'lucide-react'
-import { PageHeader } from '@/components/common/PageHeader'
+import { Search } from 'lucide-react'
+import { BigButton } from '@/components/kade/BigButton'
+import { OrderTag } from '@/components/kade/OrderTag'
+import { Pictogram } from '@/components/kade/Pictogram'
+import { Road, statusToStop, type RoadStop } from '@/components/kade/Road'
 import { EmptyState } from '@/components/common/EmptyState'
-import { OrderStatusBadge, RiskBadge } from '@/components/common/StatusBadge'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAppStore } from '@/stores/useAppStore'
+import { useLocaleStore } from '@/stores/useLocaleStore'
 import { useT } from '@/i18n'
 import type { OrderStatus } from '@/types'
-import { cn, formatLkr, formatPhone } from '@/lib/utils'
+import { ShoppingBag } from 'lucide-react'
 
-const filterIds: Array<'all' | OrderStatus> = [
-  'all',
-  'new',
-  'confirmed',
-  'on_hold',
-  'packed',
-  'dispatched',
-  'delivered',
-  'rto',
-]
+const stopToStatuses: Record<RoadStop, OrderStatus[] | 'all'> = {
+  table: ['new', 'on_hold', 'confirmed'],
+  bag: ['packed'],
+  bike: ['dispatched'],
+  door: ['delivered', 'rto', 'returned', 'cancelled'],
+  money: ['paid'],
+}
 
-const statusIds = new Set(filterIds)
+function stampFor(status: OrderStatus, t: (k: string) => string) {
+  if (status === 'packed') return { label: t('stamp.packed'), kind: 'packed' }
+  if (status === 'dispatched') return { label: t('stamp.sent'), kind: 'sent' }
+  if (status === 'delivered') return { label: t('stamp.delivered'), kind: 'delivered' }
+  if (status === 'paid') return { label: t('stamp.paid'), kind: 'paid' }
+  if (status === 'rto' || status === 'returned') return { label: t('stamp.returned'), kind: 'returned' }
+  if (status === 'confirmed') return { label: t('stamp.confirmed'), kind: 'confirmed' }
+  return undefined
+}
 
 export function OrdersPage() {
   const t = useT()
+  const simpleMode = useLocaleStore((s) => s.simpleMode)
   const orders = useAppStore((s) => s.orders)
   const [searchParams, setSearchParams] = useSearchParams()
   const [q, setQ] = useState('')
-  const statusParam = searchParams.get('status')
-  const status: 'all' | OrderStatus =
-    statusParam && statusIds.has(statusParam as 'all' | OrderStatus)
-      ? (statusParam as 'all' | OrderStatus)
-      : 'all'
+  const [showFind, setShowFind] = useState(false)
+  const roadParam = searchParams.get('road') as RoadStop | null
+  const currentRoad: RoadStop = roadParam && roadParam in stopToStatuses ? roadParam : 'table'
+  const filterAll = !roadParam
 
-  const setStatus = (next: 'all' | OrderStatus) => {
-    if (next === 'all') setSearchParams({})
-    else setSearchParams({ status: next })
+  const setRoad = (stop: RoadStop) => {
+    setSearchParams({ road: stop })
   }
 
   const filtered = useMemo(() => {
     return orders.filter((o) => {
-      const matchStatus = status === 'all' || o.status === status
+      const statuses = filterAll ? 'all' : stopToStatuses[currentRoad]
+      const matchRoad =
+        statuses === 'all' || (Array.isArray(statuses) && statuses.includes(o.status))
       const hay = `${o.number} ${o.customerName} ${o.customerPhone} ${o.channel}`.toLowerCase()
+      return matchRoad && hay.includes(q.toLowerCase())
+    })
+  }, [orders, q, currentRoad, filterAll])
+
+  // When opening /app/orders with ?status=new from old links, still work
+  const statusParam = searchParams.get('status')
+  const legacyFiltered = useMemo(() => {
+    if (!statusParam) return null
+    return orders.filter((o) => {
+      const matchStatus = o.status === statusParam
+      const hay = `${o.number} ${o.customerName} ${o.customerPhone}`.toLowerCase()
       return matchStatus && hay.includes(q.toLowerCase())
     })
-  }, [orders, q, status])
+  }, [orders, q, statusParam])
+
+  const list = legacyFiltered ?? filtered
 
   return (
-    <div>
-      <PageHeader
-        eyebrow={t('orders.eyebrow')}
-        title={t('orders.title')}
-        description={t('orders.description')}
-        tip={t('orders.tip')}
-        actions={
-          <Button asChild variant="cash" className="min-h-11">
-            <Link to="/app/orders/new">{t('nav.quickOrder')}</Link>
-          </Button>
-        }
-      />
-
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-          <Input
-            className="min-h-11 pl-9"
-            placeholder={t('orders.search')}
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-          />
+    <div className="space-y-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-extrabold">{t('orders.title')}</h1>
+          {!simpleMode ? (
+            <p className="text-base text-muted">{t('orders.description')}</p>
+          ) : null}
         </div>
       </div>
 
-      <div className="mb-4 flex max-w-full gap-1 overflow-x-auto pb-1">
-        {filterIds.map((id) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setStatus(id)}
-            className={cn(
-              'min-h-11 shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold',
-              status === id ? 'bg-ink text-on-ink' : 'border border-line bg-surface text-muted',
-            )}
-          >
-            {id === 'all' ? t('common.all') : t(`status.${id}`)}
-          </button>
-        ))}
-      </div>
+      {!simpleMode ? (
+        <BigButton to="/app/orders/new" icon={<Pictogram id="chat" />} speakText={t('today.newOrder')}>
+          {t('today.newOrder')}
+        </BigButton>
+      ) : null}
 
-      {filtered.length === 0 ? (
+      <Road
+        current={statusParam ? statusToStop(statusParam) : filterAll ? 'table' : currentRoad}
+        onSelect={setRoad}
+        t={t}
+      />
+
+      {simpleMode && !showFind ? (
+        <button
+          type="button"
+          onClick={() => setShowFind(true)}
+          className="flex min-h-14 w-full items-center justify-center gap-3 rounded-xl border-2 border-ink bg-surface px-4 py-3 font-extrabold active:translate-y-px"
+        >
+          <Pictogram id="hand" className="h-10 w-10" />
+          {t('simple.find')}
+        </button>
+      ) : (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
+          <Input
+            className="min-h-14 border-2 border-ink pl-10 text-base"
+            placeholder={t('orders.search')}
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            autoFocus={simpleMode && showFind}
+          />
+        </div>
+      )}
+
+      {list.length === 0 ? (
         <EmptyState
           icon={ShoppingBag}
           title={t('orders.emptyTitle')}
@@ -101,40 +125,37 @@ export function OrdersPage() {
           }}
         />
       ) : (
-        <div className="rounded-xl border border-line bg-surface shadow-[var(--shadow-desk)]">
-          <div className="hidden grid-cols-[1fr_1fr_auto_auto_auto] gap-3 border-b border-line bg-paper px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-muted lg:grid">
-            <span>{t('orders.title')}</span>
-            <span>{t('nav.customers')}</span>
-            <span>{t('nav.cod')}</span>
-            <span>{t('quickOrder.risk')}</span>
-            <span>Status</span>
-          </div>
-          {filtered.map((o) => (
-            <Link
-              key={o.id}
-              to={`/app/orders/${o.id}`}
-              className="grid gap-2 border-b border-line/70 px-4 py-3 last:border-0 hover:bg-paper lg:grid-cols-[1fr_1fr_auto_auto_auto] lg:items-center lg:gap-3"
-            >
-              <div className="min-w-0">
-                <p className="text-sm font-semibold">{o.number}</p>
-                <p className="text-xs text-muted capitalize">
-                  {o.channel} · {new Date(o.createdAt).toLocaleString('en-LK')}
-                </p>
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{o.customerName}</p>
-                <p className="text-xs text-muted">{formatPhone(o.customerPhone)}</p>
-              </div>
-              <p className="text-sm font-semibold lg:text-right">
-                {formatLkr(o.codAmount || o.subtotal + o.deliveryFee - o.discount)}
-              </p>
-              <div className="flex flex-wrap items-center gap-2 lg:contents">
-                <RiskBadge level={o.riskLevel} />
-                <OrderStatusBadge status={o.status} />
-              </div>
-            </Link>
-          ))}
+        <div className="space-y-3">
+          {list.map((o) => {
+            const stamp = stampFor(o.status, t)
+            return (
+              <OrderTag
+                key={o.id}
+                to={`/app/orders/${o.id}`}
+                number={o.number}
+                who={o.customerName}
+                where={o.address.city}
+                amount={o.codAmount || o.subtotal + o.deliveryFee - o.discount}
+                stamp={stamp?.label}
+                stampKind={stamp?.kind}
+              />
+            )
+          })}
         </div>
+      )}
+
+      {!statusParam ? (
+        <button
+          type="button"
+          className="text-sm font-extrabold text-lagoon"
+          onClick={() => setSearchParams({})}
+        >
+          {t('common.all')}
+        </button>
+      ) : (
+        <Link to="/app/orders" className="text-sm font-extrabold text-lagoon">
+          {t('common.all')}
+        </Link>
       )}
     </div>
   )

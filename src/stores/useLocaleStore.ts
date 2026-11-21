@@ -1,11 +1,13 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Locale } from '@/i18n/types'
+import { useThemeStore, type ThemeId } from '@/stores/useThemeStore'
 
 interface LocaleState {
   locale: Locale
   languagePicked: boolean
   simpleMode: boolean
+  themeBeforeEasy: ThemeId | null
   setLocale: (locale: Locale) => void
   pickLanguage: (locale: Locale) => void
   setSimpleMode: (v: boolean) => void
@@ -18,10 +20,11 @@ function applyDocumentLang(locale: Locale) {
 
 export const useLocaleStore = create<LocaleState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       locale: 'en',
       languagePicked: false,
       simpleMode: true,
+      themeBeforeEasy: null,
       setLocale: (locale) => {
         applyDocumentLang(locale)
         set({ locale })
@@ -30,7 +33,18 @@ export const useLocaleStore = create<LocaleState>()(
         applyDocumentLang(locale)
         set({ locale, languagePicked: true })
       },
-      setSimpleMode: (simpleMode) => set({ simpleMode }),
+      setSimpleMode: (simpleMode) => {
+        const { theme, setTheme } = useThemeStore.getState()
+        if (simpleMode) {
+          const before = theme === 'kade' ? (get().themeBeforeEasy ?? 'lagoon') : theme
+          set({ simpleMode: true, themeBeforeEasy: before })
+          setTheme('kade')
+        } else {
+          const restore = get().themeBeforeEasy ?? 'lagoon'
+          setTheme(restore)
+          set({ simpleMode: false })
+        }
+      },
     }),
     {
       name: 'ssos-locale',

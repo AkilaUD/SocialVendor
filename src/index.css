@@ -3,6 +3,7 @@
 /* Semantic tokens → Tailwind color utilities */
 @theme {
   --font-display: "Outfit", "Noto Sans Sinhala", "Noto Sans Tamil", ui-sans-serif, system-ui, sans-serif;
+  --font-money: "Archivo", "Outfit", "Noto Sans Sinhala", "Noto Sans Tamil", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Plus Jakarta Sans", "Noto Sans Sinhala", "Noto Sans Tamil", ui-sans-serif, system-ui, sans-serif;
   --font-si: "Noto Sans Sinhala", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-ta: "Noto Sans Tamil", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
@@ -25,6 +26,7 @@
   --color-line: var(--line);
   --color-surface: var(--surface);
   --color-on-ink: var(--on-ink);
+  --color-kraft: var(--kraft, #b98b52);
 
   --shadow-desk: var(--shadow-desk-val);
   --shadow-float: var(--shadow-float-val);
@@ -114,6 +116,34 @@
   --hero-glow-b: rgba(255, 138, 61, 0.16);
   --shadow-desk-val: 0 1px 0 rgba(30, 42, 74, 0.04), 0 12px 32px rgba(30, 42, 74, 0.08);
   --shadow-float-val: 0 18px 48px rgba(30, 42, 74, 0.14);
+  color-scheme: light;
+}
+
+/* Kade counter — Phase 1 zero-literacy desk (Board Blue / Bus Yellow). Existing themes kept. */
+[data-theme="kade"] {
+  --ink: #101b3d;
+  --ink-soft: #1a2a5c;
+  --lagoon: #1d3f9e;
+  --lagoon-bright: #2a54c4;
+  --mint: #e8edf4;
+  --cash: #ffc20e;
+  --cash-deep: #e0a800;
+  --risk: #d8283a;
+  --ok: #1f8a4c;
+  --paper: #e8edf4;
+  --paper-2: #dce3ee;
+  --stone: #c5cedd;
+  --muted: #3d4a6b;
+  --line: #b8c2d4;
+  --surface: #ffffff;
+  --on-ink: #ffc20e;
+  --kraft: #b98b52;
+  --hero-from: #1d3f9e;
+  --hero-to: #101b3d;
+  --hero-glow-a: rgba(29, 63, 158, 0.22);
+  --hero-glow-b: rgba(255, 194, 14, 0.18);
+  --shadow-desk-val: 0 1px 0 rgba(16, 27, 61, 0.06), 0 8px 24px rgba(16, 27, 61, 0.1);
+  --shadow-float-val: 0 12px 36px rgba(16, 27, 61, 0.16);
   color-scheme: light;
 }
 
@@ -212,5 +242,35 @@
     background-image:
       radial-gradient(circle at 20% 20%, color-mix(in oklab, var(--color-lagoon) 8%, transparent), transparent 35%),
       radial-gradient(circle at 80% 0%, color-mix(in oklab, var(--color-cash) 8%, transparent), transparent 30%);
+  }
+
+  /* Phase 1 kade utilities — used when screens migrate in Phase 2+ */
+  .font-money {
+    font-family: var(--font-money);
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .kade-flat {
+    box-shadow: none;
+    background-image: none;
+  }
+
+  .parcel-tag {
+    border: 2px solid var(--ink);
+    border-radius: 0.75rem 1.25rem 0.75rem 0.75rem;
+    background: color-mix(in oklab, var(--kraft, #b98b52) 22%, white);
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+  }
+
+  .stamp-ink {
+    font-family: var(--font-money);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    border: 3px solid currentColor;
+    border-radius: 0.35rem;
+    transform: rotate(-8deg);
+    text-transform: uppercase;
   }
 }

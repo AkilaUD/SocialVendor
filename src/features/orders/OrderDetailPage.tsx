@@ -1,13 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { ArrowLeft, Building2 } from 'lucide-react'
-import { PageHeader } from '@/components/common/PageHeader'
+import { ArrowLeft } from 'lucide-react'
+import { BigButton } from '@/components/kade/BigButton'
+import { Pictogram } from '@/components/kade/Pictogram'
+import { Road, statusToStop } from '@/components/kade/Road'
+import { Stamp } from '@/components/kade/Stamp'
 import { OrderStatusBadge, RiskBadge } from '@/components/common/StatusBadge'
 import { BankSlipDialog } from '@/components/payments/BankSlipDialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useAppStore } from '@/stores/useAppStore'
+import { useLocaleStore } from '@/stores/useLocaleStore'
 import { useT } from '@/i18n'
 import type { OrderStatus } from '@/types'
 import { formatLkr, formatPhone } from '@/lib/utils'
@@ -30,8 +34,19 @@ const nextLabelKeys: Partial<Record<OrderStatus, string>> = {
   delivered: 'orderDetail.closePaid',
 }
 
+function stampKey(status: OrderStatus): string | null {
+  if (status === 'confirmed') return 'confirmed'
+  if (status === 'packed') return 'packed'
+  if (status === 'dispatched') return 'sent'
+  if (status === 'delivered') return 'delivered'
+  if (status === 'paid') return 'paid'
+  if (status === 'rto' || status === 'returned') return 'returned'
+  return null
+}
+
 export function OrderDetailPage() {
   const t = useT()
+  const simpleMode = useLocaleStore((s) => s.simpleMode)
   const { id } = useParams()
   const orders = useAppStore((s) => s.orders)
   const bankPayments = useAppStore((s) => s.bankPayments)
@@ -39,20 +54,30 @@ export function OrderDetailPage() {
   const updateOrderStatus = useAppStore((s) => s.updateOrderStatus)
   const order = orders.find((o) => o.id === id)
   const [slipOpen, setSlipOpen] = useState(false)
+  const [stampShow, setStampShow] = useState(false)
+  const [showMoreParcel, setShowMoreParcel] = useState(false)
+
+  useEffect(() => {
+    if (!order) return
+    setStampShow(false)
+    const id = window.setTimeout(() => setStampShow(true), 50)
+    return () => window.clearTimeout(id)
+  }, [order?.status, order?.id])
 
   if (!order) {
     return (
-      <div className="rounded-xl border border-line bg-surface p-8 text-center">
-        <p className="font-display text-xl font-bold">{t('orderDetail.notFound')}</p>
-        <Button asChild className="mt-4 min-h-11" variant="outline">
-          <Link to="/app/orders">{t('orderDetail.backOrders')}</Link>
-        </Button>
+      <div className="rounded-xl border-2 border-ink bg-surface p-8 text-center">
+        <p className="text-xl font-extrabold">{t('orderDetail.notFound')}</p>
+        <BigButton to="/app/orders" className="mt-4">
+          {t('orderDetail.backOrders')}
+        </BigButton>
       </div>
     )
   }
 
   const payments = bankPayments.filter((p) => p.orderId === order.id)
   const nextKey = nextLabelKeys[order.status]
+  const sk = stampKey(order.status)
 
   const advance = () => {
     const next = nextStatus[order.status]
@@ -61,9 +86,7 @@ export function OrderDetailPage() {
       return
     }
     if (order.status === 'on_hold' && order.advancePaid <= 0) {
-      toast.message('Attach a bank slip for the advance first', {
-        description: 'Use Bank deposit + slip — common when customers pay delivery or deposit.',
-      })
+      toast.message('Attach a bank slip for the advance first')
       setSlipOpen(true)
       return
     }
@@ -93,112 +116,104 @@ export function OrderDetailPage() {
     setSlipOpen(true)
   }
 
-  const timeline = [
-    { label: t('status.new'), at: order.createdAt },
-    { label: t('status.confirmed'), at: order.confirmedAt },
-    { label: t('status.packed'), at: order.packedAt },
-    { label: t('status.dispatched'), at: order.dispatchedAt },
-    { label: t('status.delivered'), at: order.deliveredAt },
-  ]
-
   return (
-    <div>
-      <Button asChild variant="ghost" size="sm" className="mb-2 -ml-2 min-h-10">
+    <div className="space-y-4">
+      <Button asChild variant="ghost" className="min-h-11 -ml-2">
         <Link to="/app/orders">
           <ArrowLeft className="h-4 w-4" /> {t('orders.title')}
         </Link>
       </Button>
-      <PageHeader
-        eyebrow={order.channel}
-        title={order.number}
-        description={`${order.customerName} · ${formatPhone(order.customerPhone)}`}
-        tip={t('orderDetail.tip')}
-        actions={
-          <div className="flex flex-wrap gap-2">
-            <OrderStatusBadge status={order.status} />
-            <RiskBadge level={order.riskLevel} />
-          </div>
-        }
-      />
 
-      <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="space-y-4">
-          <div className="rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow-desk)]">
-            <h2 className="font-display text-lg font-bold">{t('orderDetail.lines')}</h2>
-            <div className="mt-3 divide-y divide-line">
+      <div className="parcel-tag relative p-5">
+        <p className="font-money text-sm text-muted">{order.number}</p>
+        <p className="mt-1 text-2xl font-extrabold">{order.customerName}</p>
+        <p className="text-base text-muted">{formatPhone(order.customerPhone)}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <OrderStatusBadge status={order.status} />
+          <RiskBadge level={order.riskLevel} />
+        </div>
+        {sk ? (
+          <div className="absolute right-4 top-6">
+            <Stamp label={t(`stamp.${sk}`)} kind={sk} show={stampShow} />
+          </div>
+        ) : null}
+      </div>
+
+      <Road current={statusToStop(order.status)} t={t} />
+
+      <div className="rounded-xl border-2 border-ink bg-cash/20 px-4 py-3">
+        <p className="text-base font-extrabold">{t('orderDetail.codDue')}</p>
+        <p className="font-money text-4xl">{formatLkr(order.codAmount)}</p>
+      </div>
+
+      <div className="space-y-2">
+        {nextKey ? (
+          <BigButton
+            tone="primary"
+            icon={<Pictogram id="stamp" />}
+            speakText={t(nextKey)}
+            onClick={advance}
+          >
+            {t(nextKey)}
+          </BigButton>
+        ) : null}
+        <BigButton
+          tone="ghost"
+          icon={<Pictogram id="camera" />}
+          speakText={t('orderDetail.bankDeposit')}
+          onClick={() => setSlipOpen(true)}
+        >
+          {t('orderDetail.bankDeposit')}
+        </BigButton>
+        {order.status === 'new' && order.riskLevel !== 'low' ? (
+          <BigButton tone="danger" icon={<Pictogram id="hand" />} onClick={hold} speakText={t('orderDetail.holdAdvance')}>
+            {t('orderDetail.holdAdvance')}
+          </BigButton>
+        ) : null}
+      </div>
+
+      {simpleMode && !showMoreParcel ? (
+        <button
+          type="button"
+          onClick={() => setShowMoreParcel(true)}
+          className="flex min-h-14 w-full items-center justify-center gap-3 rounded-xl border-2 border-ink bg-surface px-4 py-3 font-extrabold active:translate-y-px"
+        >
+          <Pictogram id="parcel" className="h-10 w-10" />
+          {t('simple.moreParcel')}
+        </button>
+      ) : (
+        <>
+          <div className="rounded-xl border-2 border-ink bg-surface p-4">
+            <h2 className="text-lg font-extrabold">{t('orderDetail.lines')}</h2>
+            <div className="mt-2 divide-y divide-line">
               {order.lines.map((l) => (
-                <div
-                  key={l.id}
-                  className="flex flex-col gap-0.5 py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3"
-                >
+                <div key={l.id} className="flex justify-between gap-3 py-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold">{l.productTitle}</p>
-                    <p className="text-xs text-muted">
-                      {l.variantName} · {l.sku} · ×{l.qty}
+                    <p className="font-extrabold">{l.productTitle}</p>
+                    <p className="text-sm text-muted">
+                      {l.variantName} · ×{l.qty}
                     </p>
                   </div>
-                  <p className="shrink-0 text-sm font-semibold tabular-nums">
-                    {formatLkr(l.unitPrice * l.qty)}
-                  </p>
+                  <p className="font-money shrink-0">{formatLkr(l.unitPrice * l.qty)}</p>
                 </div>
               ))}
             </div>
-            <div className="mt-3 space-y-2 border-t border-line pt-3 text-sm">
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
-                <span className="min-w-0 text-muted">{t('orderDetail.subtotal')}</span>
-                <span className="shrink-0 font-semibold tabular-nums">{formatLkr(order.subtotal)}</span>
-              </div>
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
-                <span className="min-w-0 text-muted">{t('orderDetail.delivery')}</span>
-                <span className="shrink-0 font-semibold tabular-nums">{formatLkr(order.deliveryFee)}</span>
-              </div>
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
-                <span className="min-w-0 text-muted">{t('orderDetail.discount')}</span>
-                <span className="shrink-0 font-semibold tabular-nums">-{formatLkr(order.discount)}</span>
-              </div>
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
-                <span className="min-w-0 text-muted">{t('orderDetail.bankPaid')}</span>
-                <span className="shrink-0 font-semibold tabular-nums">{formatLkr(order.advancePaid)}</span>
-              </div>
-              <div className="mt-1 flex flex-col gap-0.5 rounded-lg bg-cash/15 px-3 py-2.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
-                <span className="min-w-0 text-base font-bold">{t('orderDetail.codDue')}</span>
-                <span className="shrink-0 text-lg font-extrabold tabular-nums">
-                  {formatLkr(order.codAmount)}
-                </span>
-              </div>
-            </div>
           </div>
 
-          <div className="rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow-desk)]">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <h2 className="font-display text-lg font-bold">{t('orderDetail.bankPayments')}</h2>
-              <Button
-                size="sm"
-                variant="cash"
-                className="w-full sm:w-auto"
-                onClick={() => setSlipOpen(true)}
-              >
-                <Building2 className="h-3.5 w-3.5 shrink-0" /> {t('orderDetail.depositSlip')}
-              </Button>
-            </div>
+          <div className="rounded-xl border-2 border-ink bg-surface p-4">
+            <h2 className="text-lg font-extrabold">{t('orderDetail.bankPayments')}</h2>
             {payments.length === 0 ? (
-              <p className="mt-3 text-sm text-muted">{t('orderDetail.noSlips')}</p>
+              <p className="mt-2 text-base text-muted">{t('orderDetail.noSlips')}</p>
             ) : (
-              <div className="mt-3 space-y-2">
+              <div className="mt-2 space-y-2">
                 {payments.map((p) => (
                   <div
                     key={p.id}
-                    className="flex flex-col gap-2 rounded-lg border border-line px-3 py-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-ink/20 px-3 py-2"
                   >
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold">
-                        {formatLkr(p.amount)} · {t(`pay.${p.purpose}`)}
-                      </p>
-                      <p className="text-xs text-muted">
-                        {p.depositedAt}
-                        {p.slipName ? ` · ${p.slipName}` : ''}
-                      </p>
-                    </div>
+                    <p className="font-extrabold">
+                      {formatLkr(p.amount)} · {t(`pay.${p.purpose}`)}
+                    </p>
                     <Badge
                       variant={
                         p.status === 'verified' ? 'ok' : p.status === 'pending' ? 'cash' : 'risk'
@@ -210,99 +225,43 @@ export function OrderDetailPage() {
                 ))}
               </div>
             )}
-            <div className="mt-4 break-words rounded-lg bg-paper p-3 text-xs text-muted">
+            <p className="mt-3 break-words text-sm text-muted">
               {t('orderDetail.shareAccount')}: {tenant.bankAccount.bankName} ·{' '}
-              {tenant.bankAccount.accountNumber} · {tenant.bankAccount.branch}
-            </div>
+              {tenant.bankAccount.accountNumber}
+            </p>
           </div>
 
           {order.notes ? (
-            <div className="rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow-desk)]">
-              <p className="text-xs font-semibold tracking-wide text-muted">{t('orderDetail.notes')}</p>
-              <div className="mt-2 rounded-lg border border-dashed border-line bg-paper p-3 text-sm">
-                <p className="break-words">{order.notes}</p>
-              </div>
+            <div className="rounded-xl border-2 border-ink bg-surface p-4">
+              <p className="font-extrabold text-muted">{t('orderDetail.notes')}</p>
+              <p className="mt-2 text-base">{order.notes}</p>
             </div>
           ) : null}
-        </div>
 
-        <div className="space-y-4">
-          <div className="rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow-desk)]">
-            <h2 className="font-display text-lg font-bold">{t('orderDetail.actions')}</h2>
-            <div className="mt-3 flex flex-col gap-2">
-              <Button
-                variant="cash"
-                className="min-h-12 w-full px-4 py-3 text-base"
-                onClick={() => setSlipOpen(true)}
-              >
-                {t('orderDetail.bankDeposit')}
-              </Button>
-              {nextKey ? (
-                <Button
-                  variant="lagoon"
-                  className="min-h-12 w-full px-4 py-3 text-base"
-                  onClick={advance}
-                >
-                  {t(nextKey)}
-                </Button>
-              ) : null}
-              {order.status === 'new' && order.riskLevel !== 'low' ? (
-                <Button variant="outline" className="min-h-12 w-full px-4 py-3" onClick={hold}>
-                  {t('orderDetail.holdAdvance')}
-                </Button>
-              ) : null}
-              {order.waybill ? (
-                <Button asChild variant="soft" className="min-h-11 w-full">
-                  <Link to={`/track/${order.waybill}`}>{t('orderDetail.tracking')}</Link>
-                </Button>
-              ) : null}
-              <Button asChild variant="ghost" className="min-h-11 w-full">
-                <Link to={`/app/customers/${order.customerId}`}>{t('orderDetail.openCustomer')}</Link>
-              </Button>
-              <Button asChild variant="ghost" className="min-h-11 w-full">
-                <Link to="/app/payments">{t('orderDetail.allSlips')}</Link>
-              </Button>
-            </div>
-            {(order.waybill || order.courier) && (
-              <div className="mt-4 rounded-lg bg-paper p-3 text-sm">
-                <p className="text-xs font-semibold uppercase text-muted">{t('orderDetail.shipment')}</p>
-                <p className="mt-1 font-semibold">
-                  {order.courier} · {order.waybill}
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow-desk)]">
-            <h2 className="font-display text-lg font-bold">{t('orderDetail.timeline')}</h2>
-            <ol className="mt-3 space-y-3">
-              {timeline.map((item) => (
-                <li key={item.label} className="flex gap-3 text-sm">
-                  <span
-                    className={`mt-1.5 h-2 w-2 rounded-full ${item.at ? 'bg-lagoon' : 'bg-stone'}`}
-                  />
-                  <div>
-                    <p className="font-medium">{item.label}</p>
-                    <p className="text-xs text-muted">
-                      {item.at ? new Date(item.at).toLocaleString('en-LK') : '—'}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-
-          <div className="rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow-desk)]">
-            <h2 className="font-display text-lg font-bold">{t('orderDetail.deliverTo')}</h2>
-            <p className="mt-2 text-sm">
+          <div className="rounded-xl border-2 border-ink bg-surface p-4">
+            <h2 className="text-lg font-extrabold">{t('orderDetail.deliverTo')}</h2>
+            <p className="mt-2 text-base">
               {order.address.line1}
               <br />
               {order.address.city}, {order.address.district}
-              {order.address.postalCode ? ` ${order.address.postalCode}` : ''}
             </p>
           </div>
-        </div>
-      </div>
+
+          <div className="flex flex-col gap-2">
+            {order.waybill ? (
+              <BigButton to={`/track/${order.waybill}`} tone="board" icon={<Pictogram id="bike" />}>
+                {t('orderDetail.tracking')}
+              </BigButton>
+            ) : null}
+            <BigButton to={`/app/customers/${order.customerId}`} tone="ghost">
+              {t('orderDetail.openCustomer')}
+            </BigButton>
+            <BigButton to="/app/payments" tone="ghost">
+              {t('orderDetail.allSlips')}
+            </BigButton>
+          </div>
+        </>
+      )}
 
       <BankSlipDialog order={order} open={slipOpen} onOpenChange={setSlipOpen} />
     </div>

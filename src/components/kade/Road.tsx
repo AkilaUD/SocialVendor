@@ -1,14 +1,16 @@
-import { Bike, Home, Package, ShoppingBag, Wallet } from 'lucide-react'
+import { Pictogram } from '@/components/kade/Pictogram'
+import type { PictogramId } from '@/assets/pictograms'
 import { cn } from '@/lib/utils'
 
 export type RoadStop = 'table' | 'bag' | 'bike' | 'door' | 'money'
 
-const stops: Array<{ id: RoadStop; icon: typeof Package; labelKey: string }> = [
-  { id: 'table', icon: Package, labelKey: 'road.table' },
-  { id: 'bag', icon: ShoppingBag, labelKey: 'road.bag' },
-  { id: 'bike', icon: Bike, labelKey: 'road.bike' },
-  { id: 'door', icon: Home, labelKey: 'road.door' },
-  { id: 'money', icon: Wallet, labelKey: 'road.money' },
+/** Picture story of one parcel — not nav labels. Same words in SI/EN/TA. */
+const stops: Array<{ id: RoadStop; pictogram: PictogramId; labelKey: string }> = [
+  { id: 'table', pictogram: 'parcel', labelKey: 'road.table' }, // on the desk / මේසය
+  { id: 'bag', pictogram: 'parcel', labelKey: 'road.bag' }, // packed bag / බෑග්
+  { id: 'bike', pictogram: 'bike', labelKey: 'road.bike' }, // with courier / බයික්
+  { id: 'door', pictogram: 'door', labelKey: 'road.door' }, // at buyer / දොර
+  { id: 'money', pictogram: 'coin', labelKey: 'road.money' }, // cash in / සල්ලි
 ]
 
 export function statusToStop(status: string): RoadStop {
@@ -48,7 +50,6 @@ export function Road({
     <div className="rounded-xl border-2 border-ink bg-surface p-3">
       <div className="flex items-center justify-between gap-1">
         {stops.map((stop, i) => {
-          const Icon = stop.icon
           const active = i === idx
           const done = i < idx
           return (
@@ -63,7 +64,7 @@ export function Road({
                 !active && !done && 'text-muted',
               )}
             >
-              <Icon className="h-6 w-6 shrink-0" strokeWidth={2.5} />
+              <Pictogram id={stop.pictogram} className="h-8 w-8" />
               <span className="line-clamp-2 text-center text-[11px] font-extrabold leading-tight">
                 {t(stop.labelKey)}
               </span>

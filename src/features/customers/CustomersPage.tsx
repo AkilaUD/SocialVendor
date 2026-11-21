@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Users } from 'lucide-react'
+import { TrustMark } from '@/components/kade/TrustMark'
 import { PageHeader } from '@/components/common/PageHeader'
 import { EmptyState } from '@/components/common/EmptyState'
-import { RiskBadge } from '@/components/common/StatusBadge'
 import { Input } from '@/components/ui/input'
 import { useAppStore } from '@/stores/useAppStore'
 import { useT } from '@/i18n'
@@ -62,14 +62,14 @@ export function CustomersPage() {
             <Link
               key={c.id}
               to={`/app/customers/${c.id}`}
-              className="rounded-xl border border-line bg-surface p-4 shadow-[var(--shadow-desk)] hover:border-lagoon/40"
+              className="rounded-xl border-2 border-ink bg-surface p-4 active:translate-y-px"
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="font-display text-lg font-bold">{c.name}</p>
-                  <p className="text-sm text-muted">{formatPhone(c.phone)}</p>
+                  <p className="text-lg font-extrabold">{c.name}</p>
+                  <p className="text-base text-muted">{formatPhone(c.phone)}</p>
                 </div>
-                <RiskBadge level={c.riskLevel} />
+                <TrustMark level={c.riskLevel} label={t(`status.${c.riskLevel}`)} />
               </div>
               <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                 <div className="rounded-lg bg-paper p-2">

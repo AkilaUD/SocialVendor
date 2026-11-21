@@ -1,12 +1,13 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type ThemeId = 'lagoon' | 'night' | 'market'
+export type ThemeId = 'lagoon' | 'night' | 'market' | 'kade'
 
 export const THEMES: Array<{ id: ThemeId; label: string; hint: string }> = [
   { id: 'lagoon', label: 'Lagoon', hint: 'Teal desk' },
   { id: 'night', label: 'Night', hint: 'Low glare' },
   { id: 'market', label: 'Market', hint: 'Bright day' },
+  { id: 'kade', label: 'Kade', hint: 'Shop board' },
 ]
 
 interface ThemeState {
@@ -23,7 +24,7 @@ function applyTheme(theme: ThemeId) {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      theme: 'lagoon',
+      theme: 'kade',
       coachDismissed: false,
       setTheme: (theme) => {
         applyTheme(theme)
@@ -45,12 +46,16 @@ export function bootstrapTheme() {
   try {
     const raw = localStorage.getItem('ssos-theme')
     if (!raw) {
-      applyTheme('lagoon')
+      applyTheme('kade')
       return
     }
     const parsed = JSON.parse(raw) as { state?: { theme?: ThemeId } }
     const theme = parsed.state?.theme
-    applyTheme(theme === 'night' || theme === 'market' || theme === 'lagoon' ? theme : 'lagoon')
+    applyTheme(
+      theme === 'night' || theme === 'market' || theme === 'lagoon' || theme === 'kade'
+        ? theme
+        : 'lagoon',
+    )
   } catch {
     applyTheme('lagoon')
   }

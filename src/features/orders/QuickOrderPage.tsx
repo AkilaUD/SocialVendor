@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { BigButton } from '@/components/kade/BigButton'
+import { Pictogram } from '@/components/kade/Pictogram'
 import { PageHeader } from '@/components/common/PageHeader'
 import { RiskBadge } from '@/components/common/StatusBadge'
 import { Button } from '@/components/ui/button'
@@ -236,9 +238,14 @@ export function QuickOrderPage() {
             </div>
           </div>
 
-          <Button className="w-full min-h-12" variant="lagoon" onClick={submit}>
+          <BigButton
+            tone="primary"
+            icon={<Pictogram id="stamp" />}
+            speakText={t('quickOrder.create')}
+            onClick={submit}
+          >
             {t('quickOrder.create')}
-          </Button>
+          </BigButton>
         </div>
       </div>
     </div>

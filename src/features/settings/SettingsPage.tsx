@@ -1,5 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { BigButton } from '@/components/kade/BigButton'
+import { Pictogram } from '@/components/kade/Pictogram'
+import { SpeakButton } from '@/components/kade/SpeakButton'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ThemeSwitcher } from '@/components/common/ThemeSwitcher'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
@@ -15,9 +19,35 @@ import { cn } from '@/lib/utils'
 
 type TabId = 'business' | 'bank' | 'theme' | 'language' | 'team' | 'notifications' | 'policy'
 
+const tabIds: TabId[] = [
+  'business',
+  'bank',
+  'theme',
+  'language',
+  'team',
+  'notifications',
+  'policy',
+]
+
 export function SettingsPage() {
   const t = useT()
-  const [tab, setTab] = useState<TabId>('business')
+  const [searchParams] = useSearchParams()
+  const tabParam = searchParams.get('tab')
+  const initialTab =
+    tabParam && (tabIds as string[]).includes(tabParam) ? (tabParam as TabId) : 'business'
+  const [tab, setTab] = useState<TabId>(initialTab)
+
+  useEffect(() => {
+    if (tabParam && (tabIds as string[]).includes(tabParam)) {
+      setTab(tabParam as TabId)
+    }
+  }, [tabParam])
+
+  useEffect(() => {
+    if (tab !== 'language') return
+    const el = document.getElementById('easy-mode')
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [tab])
   const tenant = useAppStore((s) => s.tenant)
   const team = useAppStore((s) => s.team)
   const updateTenant = useAppStore((s) => s.updateTenant)
@@ -168,26 +198,41 @@ export function SettingsPage() {
       ) : null}
 
       {tab === 'language' ? (
-        <div className="max-w-xl space-y-5 rounded-xl border border-line bg-surface p-5 shadow-[var(--shadow-desk)]">
-          <div>
-            <h2 className="font-display text-lg font-bold">{t('settings.language')}</h2>
-            <p className="mt-1 text-sm text-muted">{t('lang.pickHint')}</p>
+        <div className="max-w-xl space-y-5">
+          <div
+            id="easy-mode"
+            className="rounded-2xl border-2 border-ink bg-surface p-5 shadow-[var(--shadow-desk)]"
+          >
+            <div className="flex items-start gap-3">
+              <Pictogram id={simpleMode ? 'speaker' : 'parcel'} className="h-14 w-14" />
+              <div className="min-w-0 flex-1">
+                <p className="text-2xl font-extrabold text-ink">
+                  {simpleMode ? t('simple.on') : t('simple.off')}
+                </p>
+                <p className="mt-1 text-base text-muted">{t('simple.hint')}</p>
+              </div>
+              <SpeakButton
+                text={`${simpleMode ? t('simple.on') : t('simple.off')}. ${t('simple.hint')}`}
+              />
+            </div>
+            <div className="mt-4">
+              <BigButton
+                tone={simpleMode ? 'ghost' : 'primary'}
+                icon={<Pictogram id={simpleMode ? 'hand' : 'stamp'} />}
+                speakText={simpleMode ? t('simple.turnOff') : t('simple.turnOn')}
+                onClick={() => setSimpleMode(!simpleMode)}
+              >
+                {simpleMode ? t('simple.turnOff') : t('simple.turnOn')}
+              </BigButton>
+            </div>
+          </div>
+
+          <div className="rounded-xl border-2 border-ink bg-surface p-5 shadow-[var(--shadow-desk)]">
+            <h2 className="text-lg font-extrabold">{t('settings.language')}</h2>
+            <p className="mt-1 text-base text-muted">{t('lang.pickHint')}</p>
             <div className="mt-3">
               <LanguageSwitcher />
             </div>
-          </div>
-          <div className="rounded-xl border border-line bg-paper p-4">
-            <p className="font-semibold text-ink">
-              {simpleMode ? t('simple.on') : t('simple.off')}
-            </p>
-            <p className="mt-1 text-sm text-muted">{t('simple.hint')}</p>
-            <Button
-              className="mt-3 min-h-11"
-              variant={simpleMode ? 'outline' : 'lagoon'}
-              onClick={() => setSimpleMode(!simpleMode)}
-            >
-              {simpleMode ? t('simple.turnOff') : t('simple.turnOn')}
-            </Button>
           </div>
         </div>
       ) : null}
